@@ -12,9 +12,10 @@ body {
   color: var(--text);
 }
 
-.container {
+.layout {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 /* ================= Sidebar ================= */
@@ -90,11 +91,128 @@ main {
   padding: 25px;
   display: flex;
   flex-direction: column;
-  background: url("../img/map_bg.jpg") center/cover no-repeat;
+
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+    url("../img/map_BG.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  min-height: 100vh; /* allow grow */
+  overflow-y: auto; /* allow scroll */
+
+  color: #111;
 }
 
 #map {
-  height: 50vh;
+  height: 400px;
+  width: 100%;
   border-radius: 14px;
   margin-bottom: 25px;
+}
+
+/* ================= Grid Layout ================= */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* يمين للنموذج - يسار للرفع */
+  gap: 25px;
+  align-items: start;
+}
+
+/* Upload box */
+.upload-box {
+  display: flex;
+  justify-content: center;
+}
+
+/* Form box */
+.form-box input {
+  height: 45px;
+  font-size: 14px;
+  font-family: "Cairo", sans-serif;
+}
+
+/* ================= File Upload ================= */
+
+.file-upload-form {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.file-upload-label {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 🔥 يخليه مربع */
+  max-width: 250px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #f1f1f1;
+  border-radius: 20px;
+  border: 2px dashed #0c5742;
+}
+
+.file-upload-label:hover {
+  background-color: #e8f5f1;
+  border-color: #0c5742;
+}
+
+.file-upload-label input {
+  display: none;
+}
+
+.file-upload-label svg {
+  height: 50px;
+  fill: #0c5742;
+  margin-bottom: 15px;
+}
+
+.file-upload-design {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.browse-button {
+  background-color: #0c5742;
+  padding: 8px 18px;
+  border-radius: 10px;
+  color: white;
+  transition: 0.3s;
+}
+
+.browse-button:hover {
+  background-color: #083c2e;
+}
+
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr; /* يصير فوق بعض */
+  }
+
+  .upload-box {
+    justify-content: center;
+  }
+}
+
+#submitBtn {
+  font-size: 16px;
+  font-family: "Cairo", sans-serif;
+  padding: 10px 20px;
+  background-color: #0c5742;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#submitBtn:hover {
+  background-color: #083c2e;
 }
