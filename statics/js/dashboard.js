@@ -6,7 +6,6 @@
       import {
         collection,
         onSnapshot,
-        deleteDoc,
         doc,
       } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
@@ -43,6 +42,8 @@
       const prevPageBtn = document.getElementById("prevPageBtn");
       const nextPageBtn = document.getElementById("nextPageBtn");
       const pageInfo = document.getElementById("pageInfo");
+
+      
 
       /* ===================================================
          3. Constants & Translations
@@ -349,7 +350,7 @@
                 <h4 style="margin:8px 0; color:#0c5742; font-size:18px">
                  #${report.id.substring(0,5)}
                 </h4>
- <!-- 3. Image -->
+               <!-- 3. Image -->
                 ${report.image_url ? `<img src="${report.image_url}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:10px;" onerror="this.style.display='none'" />` : ""}
 
                 <!-- 1. Severity Color Bar -->
@@ -448,11 +449,6 @@
             "beforeend",
             `
             <tr data-id="${report.id}">
-              <td>
-                <button class="action-btn delete-btn">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </td>
               <td class="focus-col">
                 #${report.id.substring(0, 5)}
               </td>
@@ -610,11 +606,6 @@
         const id = row.getAttribute("data-id");
         if (!id) return;
 
-        // Trigger Delete Report globally
-        if (e.target.closest(".delete-btn")) {
-          window.deleteReport(id);
-        }
-
         // Trigger Map Focuser tracking event
         if (e.target.closest(".focus-col")) {
           window.focusMarker(id);
@@ -642,17 +633,4 @@
         activePopup.setMap(map);
       };
 
-      /**
-       * Safely process delete sequences via Firestore.
-       * Exposed to window so it can be called from inline HTML onclick handlers.
-       * @param {string} id - The ID of the report document to delete.
-       */
-      window.deleteReport = async function (id) {
-        if (!confirm("هل أنت متأكد من حذف البلاغ؟")) return;
-        try {
-          await deleteDoc(doc(db, "reports", id));
-        } catch (err) {
-          console.error("Error deleting report: ", err);
-        }
-      };
 

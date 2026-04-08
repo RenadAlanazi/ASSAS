@@ -17,7 +17,7 @@
       rel="stylesheet"
     />
     <!-- style sheet -->
-    <link rel="stylesheet" href="../statics/css/dashboard.css" />
+    <link rel="stylesheet" href="../statics/css/projects.css" />
   </head>
 
   <body>
@@ -31,14 +31,14 @@
               <i class="fa-solid fa-chart-line"></i> لوحة التحكم
             </a>
           </li>
-          <li>
-            <a href="upload.html">
-              <i class="fa-solid fa-map-location-dot"></i> رفع بلاغ
-            </a>
-          </li>
           <li class="active">
             <a href="projects.html">
               <i class="fa-solid fa-folder"></i> المشاريع
+            </a>
+          </li>
+          <li>
+            <a href="upload.html">
+              <i class="fa-solid fa-map-location-dot"></i> رفع بلاغ
             </a>
           </li>
           <li>
@@ -67,42 +67,13 @@
           </div>
         </div>
 
-        <!-- Charts-->
-        <div
-          class="chart-container"
-          style="
-            display: flex;
-            gap: 85px;
-            justify-content: center;
-            align-items: center;
-          "
-        >
-          <div style="text-align: center">
-            <canvas id="highChart" width="150" height="150"></canvas>
-            <div style="margin-top: 8px">عالية</div>
-          </div>
-
-          <div style="text-align: center">
-            <canvas id="mediumChart" width="150" height="150"></canvas>
-            <div style="margin-top: 8px">متوسطة</div>
-          </div>
-
-          <div style="text-align: center">
-            <canvas id="lowChart" width="150" height="150"></canvas>
-            <div style="margin-top: 8px">منخفضة</div>
-          </div>
-
-          <div style="text-align: center">
-            <canvas id="completedChart" width="150" height="150"></canvas>
-            <div style="margin-top: 8px">مكتمل</div>
-          </div>
-        </div>
+        <div id="reportDetailsCard" class="report-details hidden"></div>
 
         <!-- Filters Section -->
         <div class="filter-section">
           <div class="filter-group">
             <select id="filterSeverity">
-              <option value="" disabled selected>مستوى الخطورة</option>
+              <option value="" disabled selected>الخطورة</option>
               <option value="">الكل</option>
               <option value="high">عالية</option>
               <option value="medium">متوسطة</option>
@@ -114,7 +85,27 @@
             <select id="filterLocation">
               <option value="" disabled selected>الموقع</option>
               <option value="">الكل</option>
-              <!-- باقي المواقع يتم ملؤها ديناميكيًا -->
+              <option value="الرياض">الرياض</option>
+              <option value="جدة">جدة</option>
+              <option value="الدمام">الدمام</option>
+              <option value="الخبر">الخبر</option>
+              <option value="مكة">مكة</option>
+              <option value="المدينة المنورة">المدينة المنورة</option>
+              <option value="الجبيل">الجبيل</option>
+              <option value="الظهران">الظهران</option>
+              <option value="بريدة">بريدة</option>
+              <option value="الرس">الرس</option>
+              <option value="عنيزة">عنيزة</option>
+              <option value="تبوك">تبوك</option>
+              <option value="حائل">حائل</option>
+              <option value="عرعر">عرعر</option>
+              <option value="جازان">جازان</option>
+              <option value="نجران">نجران</option>
+              <option value="الباحة">الباحة</option>
+              <option value="القنفذة">القنفذة</option>
+              <option value="سكاكا">سكاكا</option>
+              <option value="الأفلاج">الأفلاج</option>
+              <option value="وادي الدواسر">وادي الدواسر</option>
             </select>
           </div>
 
@@ -153,11 +144,13 @@
           <thead>
             <tr>
               <th>حذف</th>
-              <th>رقم</th>
-              <th>الموقع</th>
-              <th>التاريخ</th>
+              <th>رقم البلاغ</th>
               <th>الحالة</th>
-              <th>مستوى الخطورة</th>
+              <th>الموقع</th>
+              <th>تاريخ الإنشاء</th>
+              <th>تاريخ الإستلام</th>
+              <th>تاريخ الإكتمال</th>
+              <th>الخطورة</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -176,34 +169,7 @@
       </main>
     </div>
 
-    <!-- Google Maps Initialization -->
-    <script>
-      /* ===================================================
-         1. Public Window Functions (Pre-Init)
-      =================================================== */
-      let map;
-
-      // Ensure initMap is available globally for Google Maps API callback
-      window.initMap = function () {
-        map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 11,
-          center: { lat: 24.7136, lng: 46.6753 }, // Riyadh
-        });
-      };
-    </script>
-
     <!-- Firebase + Dashboard Logic -->
-    <script type="module" src="../statics/js/dashboard.js"></script>
-
-    <!-- Google Maps -->
-    <script
-      async
-      defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-uPN8afr4qXu5JE1Iew0wR5WfK3YscwY&callback=initMap"
-    ></script>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script type="module" src="../statics/js/projects.js"></script>
   </body>
 </html>
