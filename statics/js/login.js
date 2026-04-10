@@ -1,6 +1,7 @@
 import { auth } from "../js/firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+
 /* Handle Login*/
 window.handleLogin = async function (e) {
   e.preventDefault();
@@ -33,6 +34,12 @@ window.handleLogin = async function (e) {
     }
 
     const data = await response.json();
+
+    // 🔥  : حفظ بيانات المستخدم في ذاكرة المتصفح
+    // نحفظ الكائن 'data' الذي يحتوي على الاسم، الدور، والإيميل القادم من Flask
+    localStorage.setItem("user", JSON.stringify(data));
+
+  
 
     /* 🔥 Role-based redirect */
     if (data.role === "engineer") {
