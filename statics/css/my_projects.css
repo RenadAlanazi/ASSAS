@@ -393,12 +393,6 @@ td {
   text-align: center;
 }
 
-.info-item i {
-  color: var(--green);
-  width: 20px;
-  text-align: center;
-}
-
 /* image (Left Side due to RTL since it's the second child) */
 .details-image {
   width: 260px;

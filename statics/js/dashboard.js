@@ -355,9 +355,6 @@
                  #${report.id.substring(0,5)}
                 </h4>
 
-                <!-- Severity Color Bar -->
-                <div style="height:6px; border-radius:10px; margin-bottom:10px; background:${getColor(report)};"></div>               
-                
                 <!-- Created At -->
                 <p style="margin:5px 0;">📅 <b>تاريخ الإنشاء:</b> ${formatDate(createdDate)}</p>
 
