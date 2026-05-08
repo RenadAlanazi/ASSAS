@@ -22,6 +22,9 @@ body {
   font-family: "Cairo", sans-serif;
   background: var(--bg);
   color: var(--text);
+  /* تحسين عرض الخطوط ومنع الاهتزاز */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
@@ -38,8 +41,8 @@ aside {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh; /* يخليه يأخذ طول الشاشة كحد أدنى */
-  height: 100%; /*  يخليه يمتد مع الصفحة إذا كان المحتوى طويل */
+  min-height: 100vh;
+  height: 100%;
 }
 
 body.dark aside {
@@ -105,6 +108,7 @@ aside ul li a {
   justify-content: flex-start;
   transition: 0.3s;
 }
+
 .logout-btn:hover {
   background: #c9302c;
 }
@@ -127,21 +131,29 @@ main {
   flex: 1;
 }
 
+/* منع اهتزاز الاسم عند التحميل */
 .profile-text h2 {
   margin: 0;
+  min-height: 1.4em;
+  min-width: 200px;
 }
 
 .profile-text p {
   margin: 4px 0;
   color: gray;
+  min-width: 100px;
+  min-height: 1.2em;
 }
 
+/* تثبيت مساحة الصورة ومنع انضغاطها */
 .profile-img {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   border: 3px solid var(--border);
   object-fit: cover;
+  flex-shrink: 0;
+  background-color: var(--card); /* لون خلفية مؤقت */
 }
 
 .back-icon {
@@ -155,7 +167,7 @@ main {
   transform: translateX(5px);
 }
 
-/* Contact */
+/* Contact Row - منع اهتزاز الهاتف والإيميل */
 .contact-row {
   display: flex;
   justify-content: space-between;
@@ -163,6 +175,13 @@ main {
   color: var(--green);
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.contact-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px; /* يحجز مساحة كافية للإيميل */
 }
 
 /* Section title */
@@ -186,7 +205,7 @@ body.dark .card {
   box-shadow: none;
 }
 
-/* Grid */
+/* Grid - منع انهيار الحقول عند فراغ البيانات */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -196,11 +215,19 @@ body.dark .card {
 .grid div {
   display: flex;
   flex-direction: column;
+  min-height: 50px; /* ارتفاع ثابت يحجز مساحة العنوان والقيمة */
+}
+
+.grid span {
+  min-width: 120px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .grid strong {
   font-size: 14px;
   opacity: 0.8;
+  margin-bottom: 2px;
 }
 
 /* Status */
@@ -264,5 +291,8 @@ input:checked + .slider::before {
   }
   .profile-header {
     flex-wrap: wrap;
+  }
+  .contact-row span {
+    min-width: 100%; /* في الجوال يأخذ السطر كاملاً لمنع التداخل */
   }
 }

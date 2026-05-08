@@ -71,7 +71,8 @@
         <div class="profile-header">
           <!-- تعديل: حاوية الصورة مع خاصية التحرير -->
           <div class="profile-img-container" onclick="document.getElementById('imageInput').click()">
-            <img id="profile_img" src="../statics/img/user.png" class="profile-img" />
+            <!-- في profile.html استبدلي سطر الصورة بهذا -->
+            <img id="profile_img" src="https://ui-avatars.com/api/?name=User&background=145b44&color=fff" class="profile-img" />
             <div class="edit-overlay">
               <span><i class="fa-solid fa-camera"></i> تحرير</span>
             </div>
@@ -81,9 +82,9 @@
           <input type="file" id="imageInput" accept="image/*" style="display: none;" />
           
           <div class="profile-text">
-            <h2 id="name">...</h2>
-            <p id="employee_id">...</p>
-            <span id="role"></span><br />
+            <h2 id="name"></h2>
+            <p id="employee_id"></p>
+            <!-- <span id="role"></span><br /> -->
             <span id="role2"></span>
             
             <!-- زر الحفظ يظهر فقط عند اختيار صورة جديدة -->

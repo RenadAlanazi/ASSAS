@@ -1,7 +1,6 @@
 import { auth } from "../js/firebase.js";
 import {
   onAuthStateChanged,
-  signOut,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 /* 1. التحقق من المستخدم وجلب البيانات */
@@ -11,10 +10,12 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // تحميل سريع من الكاش (Local Storage) أول ما تفتح الصفحة
+  // أ. تحميل فوري من الذاكرة المحلية (LocalStorage) لسرعة الاستجابة
   const cachedUser = localStorage.getItem('user');
-  if (cachedUser) {
-    fillProfileData(JSON.parse(cachedUser));
+  let localData = cachedUser ? JSON.parse(cachedUser) : null;
+
+  if (localData) {
+    fillProfileData(localData);
   }
 
   try {
@@ -24,87 +25,107 @@ onAuthStateChanged(auth, async (user) => {
     });
 
     if (response.ok) {
-      const data = await response.json();
-      fillProfileData(data); // تحديث الصفحة بالبيانات الجديدة
-      localStorage.setItem('user', JSON.stringify(data)); // حفظ لللمرة الجاية
+      const serverData = await response.json();
+      
+      // ج. حماية الصورة: إذا السيرفر لم يرسل رابطاً بعد، نتمسك بما لدينا في الكاش
+      if (!serverData.profile_image && localData && localData.profile_image) {
+          serverData.profile_image = localData.profile_image;
+      }
+
+      // د. تحديث الذاكرة المحلية بالبيانات "المعربة والذكية" القادمة من الباكند الجديد
+      localStorage.setItem('user', JSON.stringify(serverData));
+      
+      // هـ. التحديث الذكي: المقارنة تمنع الومضة (Flickering) عند تحميل البيانات الحية
+      if (JSON.stringify(serverData) !== JSON.stringify(localData)) {
+          fillProfileData(serverData); 
+      }
     }
   } catch (error) {
-    console.error("خطأ في جلب البيانات:", error);
+    console.error("خطأ في جلب البيانات من السيرفر:", error);
   }
 });
 
-/* 2. دالة تعبئة البيانات (معدلة حسب الـ HTML حقك بالضبط) */
+/* 2. دالة تعبئة البيانات (النسخة النهائية المستقرة) */
 function fillProfileData(data) {
   if (!data) return;
 
-  // الجزء العلوي (الاسم والـ ID والرتبة)
-  document.getElementById("name").innerText = data.name || " ";
-  document.getElementById("employee_id").innerText = data.employee_id || "ID-0000";
-  document.getElementById("role").innerText = data.role === "employee" ? "موظف" : (data.role || "");
+  const safeUpdateText = (id, newText) => {
+    const element = document.getElementById(id);
+    const textValue = String(newText || "");
+    if (element && element.innerText !== textValue) {
+      element.innerText = textValue;
+    }
+  };
 
-  // التواصل
-  document.getElementById("phone").innerText = data.phone || "";
-  document.getElementById("email").innerText = data.email || "";
+  // --- منطق الرتبة (لضمان المزامنة بين حساب الموظف والمهندس) ---
+  const rawRole = String(data.role || "").toLowerCase().trim();
+  const isEmployee = rawRole === "employee";
 
-  // --- معلومات العمل  ---
+  safeUpdateText("name", data.name);
+  safeUpdateText("employee_id", data.employee_id);
   
-  // القسم: ياخذ من مفتاح department في السيرفر
-  document.getElementById("department").innerText = data.department || "إدارة البلاغات";
+  // تحديث الرتبة العلوية
+  safeUpdateText("role", isEmployee ? "موظف" : "مهندس");
 
-  // الدور الوظيفي: هنا بنحط فيه "إدارة البلاغات" أو أي مسمى ثاني تبيه
-  document.getElementById("role_display").innerText = data.role_display || "موظف ميداني";
-
-  // حالة الحساب والتاريخ
-  document.getElementById("status").innerText = data.status || "نشط";
-  document.getElementById("joined_date").innerText = data.joined_date || "";
-
-  // --- ملخص النشاط ---
-  document.getElementById("total_reports").innerText = data.total_reports ?? 0;
-  document.getElementById("reports_in_progress").innerText = data.reports_in_progress ?? 0;
-  document.getElementById("completed_reports").innerText = data.completed_reports ?? 0;
-  document.getElementById("last_activity").innerText = data.last_activity || "لا يوجد نشاط قريب";
-
+  // تحديث تسمية الإحصائيات بناءً على الرتبة (مرفوعة للموظف / مستلمة للمهندس)
   const taskLabel = document.getElementById("task_label");
   if (taskLabel) {
-    // إذا كان المودل (الرتبة) موظف، يغير الكلمة لـ "المرفوعة"
-    if (data.role === "employee") {
-        taskLabel.innerText = "عدد البلاغات المرفوعة";
-    } else {
-        // إذا كان مهندس (أو أي رتبة ثانية) يخليها "المستلمة"
-        taskLabel.innerText = "عدد البلاغات المستلمة";
+    const expectedLabel = isEmployee ? "عدد البلاغات المرفوعة" : "عدد البلاغات المستلمة";
+    if (taskLabel.innerText !== expectedLabel) {
+      taskLabel.innerText = expectedLabel;
     }
   }
+
+  safeUpdateText("phone", data.phone);
+  safeUpdateText("email", data.email);
+  
+  // البيانات التالية تأتي الآن "جاهزة ومعربة" من الباكند الجديد (مثلMaintenance -> قسم الصيانة)
+  safeUpdateText("department", data.department);
+  safeUpdateText("role_display", data.role_display);
+  safeUpdateText("status", data.status);
+  safeUpdateText("joined_date", data.joined_date);
+
+  // --- إدارة الصورة وحل مشكلة الحروف العربية (ثبات فوري) ---
+  const profileImg = document.getElementById("profile_img");
+  const userName = data.name || "User";
+  let targetSrc = "";
+
+  if (data.profile_image && data.profile_image.startsWith('http')) {
+      targetSrc = data.profile_image;
+  } else {
+      // استخراج أول حرف يدوياً لضمان ظهوره عربياً فوراً وبدون تبديل من الإنجليزية
+      const firstChar = userName.trim().charAt(0);
+      targetSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstChar)}&background=145b44&color=fff&size=128&length=1`;
+  }
+
+  // تحديث الصورة فقط إذا تغير الرابط فعلاً لمنع Shifting
+  if (profileImg && profileImg.getAttribute('src') !== targetSrc) {
+      profileImg.src = targetSrc;
+  }
+
+  safeUpdateText("total_reports", data.total_reports ?? 0);
+  safeUpdateText("reports_in_progress", data.reports_in_progress ?? 0);
+  safeUpdateText("completed_reports", data.completed_reports ?? 0);
+  safeUpdateText("last_activity", data.last_activity);
 }
 
-/* 4. زر الرجوع */
-window.goBack = function () {
-  window.history.back();
-};
-
-// 1. تعريف العناصر
+/* 3. منطق رفع وحفظ الصورة الشخصية */
 const imageInput = document.getElementById('imageInput');
-const profileImg = document.getElementById('profile_img');
+const profileImgMain = document.getElementById('profile_img'); 
 const saveBtn = document.getElementById('save_image_btn');
 
-// 2. كود المعاينة (Preview) عند اختيار الملف
 imageInput.addEventListener('change', function() {
     const file = this.files[0];
     if (file) {
         const reader = new FileReader();
-        
-        // عندما ينتهي المتصفح من قراءة الملف
         reader.onload = function(e) {
-            // نغير رابط الصورة الموجودة في الصفحة للصورة الجديدة
-            profileImg.src = e.target.result;
-            // نُظهر زر الحفظ عشان المستخدم يضغط عليه للرفع
+            profileImgMain.src = e.target.result;
             saveBtn.style.display = 'block';
         };
-        
         reader.readAsDataURL(file);
     }
 });
 
-// 3. كود الرفع الفعلي للسيرفر (عند ضغط زر حفظ الصورة)
 saveBtn.addEventListener('click', async () => {
     const file = imageInput.files[0];
     if (!file) return;
@@ -113,31 +134,41 @@ saveBtn.addEventListener('click', async () => {
     formData.append('profile_image', file);
 
     try {
-        saveBtn.textContent = "⏳ جاري الرفع...";
+        saveBtn.disabled = true;
+        saveBtn.textContent = "⏳ جاري الحفظ...";
         
-        // جلب الـ Token (مهم جداً لأن الـ Backend يطلبه)
-        const token = localStorage.getItem("token"); 
+        const user = auth.currentUser;
+        if (!user) {
+            alert("❌ انتهت الجلسة، يرجى تسجيل الدخول");
+            return;
+        }
+        const token = await user.getIdToken(); 
 
-        const response = await fetch('https://assas-backend-o9r8.onrender.com/profile/update-profile-image', {
+        const response = await fetch('https://assas-backend-o9r8.onrender.com/update-profile-image', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
 
         const result = await response.json();
 
         if (result.success) {
-            alert("✅ تم تحديث الصورة بنجاح");
-            saveBtn.style.display = 'none'; // نخفي الزر بعد النجاح
+            alert("✅ تم حفظ الصورة وتثبيتها بنجاح");
+            
+            let currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
+            currentUserData.profile_image = result.image_url;
+            localStorage.setItem('user', JSON.stringify(currentUserData));
+            
+            profileImgMain.src = result.image_url;
+            saveBtn.style.display = 'none';
         } else {
-            alert("❌ فشل الرفع: " + result.error);
+            alert("❌ فشل الحفظ: " + result.error);
         }
     } catch (error) {
         console.error("Upload error:", error);
         alert("❌ حدث خطأ في الاتصال بالسيرفر");
     } finally {
+        saveBtn.disabled = false;
         saveBtn.textContent = "حفظ الصورة";
     }
 });
