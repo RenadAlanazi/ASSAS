@@ -68,6 +68,16 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+// دالة توحيد مسميات الأضرار (لحل مشكلة اختلاف اللغات في الفلتر)
+function normalizeDamageType(value) {
+  const damage = String(value || "").trim().toLowerCase();
+  if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
+  if (["crack", "cracks", "تشقق", "شقوق"].includes(damage)) return "crack";
+  if (["water", "water_pool", "water accumulation", "تجمع مياه"].includes(damage)) return "water";
+  if (["normal", "safe", "سليم", "طبيعي"].includes(damage)) return "normal";
+  return damage;
+}
+
 const getCurrentUserId = () => {
   try {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -132,6 +142,8 @@ const applyFiltersAndSearch = () => {
       const street = report.street_name ? report.street_name.toLowerCase() : "";
       if (!report.id.includes(searchVal) && !street.includes(searchVal)) match = false;
     }
+
+    // --- تعديل فلتر الخطورة (Severity Filter) ---
     if (severityVal) {
       const reportSev = String(report.severity || "").toLowerCase();
       const filterSev = severityVal.toLowerCase();
@@ -147,11 +159,20 @@ const applyFiltersAndSearch = () => {
 
       if (!isSeverityMatch) match = false;
     }
+
     if (statusVal && report.status !== statusVal) match = false;
     if (locationVal && (!report.street_name || !report.street_name.includes(locationVal))) match = false;
-    if (damageTypeVal && report.damage_type !== damageTypeVal) match = false;
+
+    // --- تعديل فلتر نوع الضرر (Damage Type Filter) ---
+    if (damageTypeVal) {
+      const reportType = normalizeDamageType(report.damage_type || report.prediction || "");
+      const selectedType = normalizeDamageType(damageTypeVal);
+      if (reportType !== selectedType) match = false;
+    }
+
     if (dateFromVal && report.created_at && new Date(report.created_at.toDate ? report.created_at.toDate() : report.created_at) < dateFromVal) match = false;
     if (dateToVal && report.created_at && new Date(report.created_at.toDate ? report.created_at.toDate() : report.created_at) > dateToVal) match = false;
+    
     return match;
   });
 
@@ -267,7 +288,7 @@ const renderDetails = (report) => {
         <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>الموقع: ${report.street_name || "غير محدد"}</span></div>
         <div class="info-item"><i class="fa-solid fa-user"></i> <span>الموظف: ${usersMap[report.created_by]?.name || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>المهندس: ${usersMap[report.assigned_to]?.name || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[report.damage_type] || report.damage_type || "-"}</span></div>
+        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[normalizeDamageType(report.damage_type || report.prediction)] || report.damage_type || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>الخطورة: ${severityTranslation[report.severity] || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-brain"></i> <span>التنبؤ: ${report.prediction || report.prediction_note || "-"}</span></div>
       </div>

@@ -1,4 +1,3 @@
-
 /* =================================================== IMPORTS =================================================== */
 import { db, auth } from "./firebase.js";
 import { collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -58,6 +57,16 @@ const formatDate = (date) => {
   const day = date.getDate();
   return `${year}-${month}-${day}`;
 };
+
+// دالة توحيد مسميات الأضرار لضمان عمل الفلتر بدقة
+function normalizeDamageType(value) {
+  const damage = String(value || "").trim().toLowerCase();
+  if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
+  if (["crack", "cracks", "تشقق", "شقوق"].includes(damage)) return "crack";
+  if (["water", "water_pool", "water accumulation", "تجمع مياه"].includes(damage)) return "water";
+  if (["normal", "safe", "سليم", "طبيعي"].includes(damage)) return "normal";
+  return damage;
+}
 
 /* =================================================== MAIN LOGIC =================================================== */
 const renderTablePaginated = () => {
@@ -130,10 +139,33 @@ const applyFiltersAndSearch = () => {
       if (!report.id.includes(searchVal) && !street.includes(searchVal)) match = false;
     }
 
-    if (severityVal && report.severity !== severityVal) match = false;
+    // تعديل فلتر الخطورة ليتعرف على الألوان (Red, Yellow...)
+    if (severityVal) {
+      const reportSev = String(report.severity || "").toLowerCase();
+      const filterSev = severityVal.toLowerCase();
+      let isSeverityMatch = false;
+
+      if (filterSev === "high" && (reportSev === "high" || reportSev === "red")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "medium" && (reportSev === "medium" || reportSev === "orange")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "low" && (reportSev === "low" || reportSev === "yellow")) {
+        isSeverityMatch = true;
+      }
+
+      if (!isSeverityMatch) match = false;
+    }
+
     if (statusVal && report.status !== statusVal) match = false;
     if (locationVal && (!report.street_name || !report.street_name.includes(locationVal))) match = false;
-    if (damageTypeVal && report.damage_type !== damageTypeVal) match = false;
+
+    // تعديل فلتر النوع ليتعرف على المسميات العربية والإنجليزية
+    if (damageTypeVal) {
+      const reportType = normalizeDamageType(report.damage_type || report.prediction || "");
+      const selectedType = normalizeDamageType(damageTypeVal);
+      if (reportType !== selectedType) match = false;
+    }
+
     if (dateFromVal && report.created_at && new Date(report.created_at.toDate?.() || report.created_at) < dateFromVal) match = false;
     if (dateToVal && report.created_at && new Date(report.created_at.toDate?.() || report.created_at) > dateToVal) match = false;
 
@@ -176,6 +208,7 @@ const renderDetails = (report) => {
   reportDetailsCard.className = `report-details ${report.status}`;
   reportDetailsCard.classList.remove("hidden");
 
+  // عرض كرت التفاصيل مع ترجمة الخطورة ونوع الضرر الموحدة
   reportDetailsCard.innerHTML = `
     <div class="details-info">
       <div class="details-info-header">
@@ -185,7 +218,7 @@ const renderDetails = (report) => {
         <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>الموقع: ${report.street_name || "غير محدد"}</span></div>
         <div class="info-item"><i class="fa-solid fa-user"></i> <span>الموظف: ${usersMap[report.created_by] || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>المهندس: ${usersMap[report.assigned_to] || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[report.damage_type] || report.damage_type || "-"}</span></div>
+        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[normalizeDamageType(report.damage_type || report.prediction)] || report.damage_type || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>الخطورة: ${severityTranslation[report.severity] || "-"}</span></div>
         <div class="info-item"><i class="fa-solid fa-brain"></i> <span>التنبؤ: ${report.prediction || report.prediction_note || "-"}</span></div>
       </div>
