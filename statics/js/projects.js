@@ -132,7 +132,21 @@ const applyFiltersAndSearch = () => {
       const street = report.street_name ? report.street_name.toLowerCase() : "";
       if (!report.id.includes(searchVal) && !street.includes(searchVal)) match = false;
     }
-    if (severityVal && report.severity !== severityVal) match = false;
+    if (severityVal) {
+      const reportSev = String(report.severity || "").toLowerCase();
+      const filterSev = severityVal.toLowerCase();
+      let isSeverityMatch = false;
+
+      if (filterSev === "high" && (reportSev === "high" || reportSev === "red")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "medium" && (reportSev === "medium" || reportSev === "orange")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "low" && (reportSev === "low" || reportSev === "yellow")) {
+        isSeverityMatch = true;
+      }
+
+      if (!isSeverityMatch) match = false;
+    }
     if (statusVal && report.status !== statusVal) match = false;
     if (locationVal && (!report.street_name || !report.street_name.includes(locationVal))) match = false;
     if (damageTypeVal && report.damage_type !== damageTypeVal) match = false;

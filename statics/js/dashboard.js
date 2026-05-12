@@ -351,7 +351,21 @@ function applyFiltersAndSearch() {
       if (!idMatch && !streetMatch) isMatch = false;
     }
 
-    if (severityVal && report.severity !== severityVal) isMatch = false;
+    if (severityVal) {
+      const reportSev = String(report.severity || "").toLowerCase();
+      const filterSev = severityVal.toLowerCase();
+      let isSeverityMatch = false;
+
+      if (filterSev === "high" && (reportSev === "high" || reportSev === "red")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "medium" && (reportSev === "medium" || reportSev === "orange")) {
+        isSeverityMatch = true;
+      } else if (filterSev === "low" && (reportSev === "low" || reportSev === "yellow")) {
+        isSeverityMatch = true;
+      }
+
+      if (!isSeverityMatch) isMatch = false;
+    }
     if (statusVal && report.status !== statusVal) isMatch = false;
     if (damageVal && getReportDamageType(report) !== normalizeDamageType(damageVal)) isMatch = false;
 
@@ -468,18 +482,18 @@ onSnapshot(collection(db, "reports"), (snapshot) => {
   let totalReports = allReports.length;
   let counts = { high: 0, medium: 0, low: 0, completed: 0 };
 
-  allReports.forEach((report) => {
-    switch (report.severity) {
-      case "high":
-        counts.high++;
-        break;
-      case "medium":
-        counts.medium++;
-        break;
-      case "low":
-        counts.low++;
-        break;
+ allReports.forEach((report) => {
+    // نحول النص لحروف صغيرة عشان يتطابق مع الحالات
+    const sev = String(report.severity || "").toLowerCase();
+
+    if (sev === "high" || sev === "red") {
+      counts.high++;
+    } else if (sev === "medium" || sev === "orange") {
+      counts.medium++;
+    } else if (sev === "low" || sev === "yellow") {
+      counts.low++;
     }
+
     if (report.status === "completed") {
       counts.completed++;
     }
