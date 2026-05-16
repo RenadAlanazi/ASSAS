@@ -8,7 +8,7 @@
     <link
       rel="icon"
       type="image/png"
-      href="../statics/img/Assas_clear_logo.png"
+      href="../statics/img/Assas_clear_logo_2.png"
     />
 
     <!-- Font Awesome -->
@@ -25,6 +25,8 @@
 
     <!-- style sheet -->
     <link rel="stylesheet" href="../statics/css/index.css" />
+    <!-- Injected dark theme support -->
+    <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
   <body class="home-page">
     <!-- Navbar -->
@@ -38,14 +40,12 @@
       </div>
 
       <div class="left">
-        <span class="lang">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"></circle>
-            <path d="M3 12h18"></path>
-            <path d="M12 3a15 15 0 0 1 0 18"></path>
-            <path d="M12 3a15 15 0 0 0 0 18"></path>
-          </svg>
-          <span class="lang-text">English</span>
+        <!-- Injected translation support and language toggle integration -->
+        <span class="lang language-toggle">
+          <span class="lang-text" data-ar="English" data-en="العربية">
+            English
+          </span>
+          <i class="fa-solid fa-globe"></i>
         </span>
 
         <img
@@ -58,8 +58,14 @@
 
     <!-- Main Section -->
     <section class="hero">
-      <h1>أهلاً بك في عسّاس</h1>
-      <p>
+      <!-- Injected translation support -->
+      <h1 data-ar="أهلاً بك في عسّاس" data-en="Welcome to Assas">
+        أهلاً بك في عسّاس
+      </h1>
+      <p
+        data-ar="منصتك الذكية لرصد وتحسين جودة الطرق لخدمة المدن والمجتمع وتعزيز كفاءة الصيانة الذكية."
+        data-en="A smart platform for monitoring road quality, prioritizing maintenance, and helping city teams respond faster."
+      >
         منصتك الذكية لرصد وتحسين جودة الطرق لخدمة المدن والمجتمع وتعزيز كفاءة
         الصيانة الذكية.
       </p>
@@ -68,28 +74,54 @@
         <!-- موظف عساس -->
         <div class="card employee">
           <div class="card-content">
-            <h3>موظف عسّاس</h3>
-            <p>الصلاحيات الإدارية والتحليل</p>
-            <a href="emp_login.html" class="card-arrow">
+            <!-- Injected translation support -->
+            <h3 data-ar="موظف عسّاس" data-en="Assas Admin">موظف عسّاس</h3>
+            <p
+              data-ar="الصلاحيات الإدارية والتحليل"
+              data-en="Manage reports<br>and analytics"
+            >
+              الصلاحيات الإدارية والتحليل
+            </p>
+            <a
+              href="emp_login.html"
+              class="card-arrow"
+              data-ar="دخول"
+              data-en="Login"
+            >
               دخول <i class="fa-solid fa-arrow-left"></i>
             </a>
           </div>
-          <img src="../statics/img/Assas_green_logo.png" class="card-logo" />
+          <img src="../statics/img/Assas_clear_logo_2.png" class="card-logo" />
         </div>
 
         <!-- مهندس عساس -->
         <div class="card engineer">
           <div class="card-content">
-            <h3>مهندس عسّاس</h3>
-            <p>لاستلام المهام الميدانية</p>
-            <a href="eng_login.html" class="card-arrow">
+            <!-- Injected translation support -->
+            <h3 data-ar="مهندس عسّاس" data-en="Assas Engineer">مهندس عسّاس</h3>
+            <p
+              data-ar="لاستلام المهام الميدانية"
+              data-en="Receive and update<br>field tasks"
+            >
+              لاستلام المهام الميدانية
+            </p>
+            <a
+              href="eng_login.html"
+              class="card-arrow"
+              data-ar="دخول"
+              data-en="Login"
+            >
               دخول <i class="fa-solid fa-arrow-left"></i>
             </a>
           </div>
-          <img src="../statics/img/Assas_white_logo.png" class="card-logo" />
+          <img src="../statics/img/Assas_clear_logo.png" class="card-logo" />
         </div>
       </div>
     </section>
+
+    <!-- Injected settings integration for dark mode and translations -->
+    <script type="module" src="../statics/js/settings.js"></script>
+
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const urlParams = new URLSearchParams(window.location.search);

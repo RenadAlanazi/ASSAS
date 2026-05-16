@@ -13,7 +13,7 @@
 ========================================================= */
 .home-page {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+    linear-gradient(rgba(255, 255, 255, 0.82), rgba(246, 250, 248, 0.88)),
     url("../img/map_BG.jpg");
 
   background-size: cover;
@@ -23,8 +23,58 @@
   height: 100vh; /* جعل الصفحة بارتفاع الشاشة */
   overflow: hidden; /* منع ظهور scroll */
 
-  color: #111;
+  color: #12231d;
   position: relative;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ===== Dark Mode ===== */
+body.dark.home-page {
+  background-image: 
+    linear-gradient(rgba(8, 19, 15, 0.85), rgba(8, 19, 15, 0.85)),
+    url("../img/map_BG.jpg");
+  color: #edf7f2;
+}
+
+body.dark.home-page .lang {
+  color: #35b989;
+}
+
+body.dark.home-page .lang svg {
+  stroke: #35b989;
+}
+
+body.dark.home-page .hero h1 {
+  color: #edf7f2;
+}
+
+body.dark.home-page .hero p {
+  color: #9fb5ad;
+}
+
+body.dark.home-page .engineer {
+  background: rgba(21, 42, 35, 0.9);
+  border-color: #35b989;
+  color: #edf7f2;
+}
+
+body.dark.home-page .employee {
+  background: #0c5742;
+  border-color: #08382a;
+}
+
+body.dark.home-page .engineer .card-arrow {
+  color: #35b989;
+  border-color: #35b989;
+  background: rgba(53, 185, 137, 0.1);
+}
+
+body.dark.home-page .engineer .card-arrow:hover {
+  background: rgba(53, 185, 137, 0.2);
+}
+
+body.dark.home-page .vision-logo {
+  filter: brightness(0) invert(1) opacity(0.7);
 }
 
 /* =========================================================
@@ -99,7 +149,7 @@
 
   margin-left: -100px;
 
-  color: #0c4f38; /* اللون الأخضر الأساسي */
+  color: #0b5f47; /* اللون الأخضر الأساسي */
   cursor: pointer;
 }
 
@@ -108,7 +158,7 @@
   width: 16px;
   height: 16px;
 
-  stroke: #0c4f38;
+  stroke: #0b5f47;
   fill: none;
   stroke-width: 2;
 }
@@ -116,6 +166,73 @@
 /* النص داخل زر اللغة */
 .home-page .lang-text {
   line-height: 1;
+}
+.language-toggle {
+  cursor: pointer;
+  position: relative;
+  z-index: 999;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+}
+
+.language-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.language-toggle .lang-text,
+.language-toggle i {
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.language-toggle:hover .lang-text,
+.language-toggle:hover i {
+  color: #088a5f;
+}
+
+.language-toggle:hover i {
+  transform: rotate(12deg);
+}
+
+.home-page.english-mode .hero {
+  direction: ltr;
+  text-align: left;
+}
+
+.home-page.english-mode .cards {
+  flex-direction: row-reverse;
+}
+
+.home-page.english-mode .card {
+  direction: ltr;
+  flex-direction: row-reverse;
+}
+
+.home-page.english-mode .card-content {
+  align-items: flex-start;
+  text-align: left;
+  margin-right: 15px;
+  margin-left: 0;
+  padding-left: 10px;
+}
+
+.home-page.english-mode .card-arrow {
+  left: auto;
+  right: 20px;
+}
+
+.home-page.english-mode .card-arrow i {
+  transform: rotate(180deg);
+}
+.home-page.english-mode .card-logo {
+  margin-right: 10px;
 }
 
 /* =========================================================
@@ -178,9 +295,12 @@
   height: 190px;
 
   border-radius: 25px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 24px 55px rgba(15, 23, 42, 0.13);
 
-  transition: 0.3s;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 
   display: flex;
   flex-direction: row-reverse;
@@ -231,18 +351,18 @@
    تصميم كرت المهندس
 ========================================================= */
 .home-page .engineer {
-  background: #ffffff;
-  border: 2.5px solid #0c4f38;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+  border: 2.5px solid rgba(11, 95, 71, 0.82);
 }
 
 .home-page .engineer .card-arrow {
-  color: #0c4f38;
-  border-color: #0c4f38;
-  background: rgba(12, 79, 56, 0.05);
+  color: #0b5f47;
+  border-color: #0b5f47;
+  background: rgba(12, 95, 71, 0.08);
 }
 
 .home-page .engineer .card-arrow:hover {
-  background: rgba(8, 138, 95, 0.29);
+  background: rgba(12, 95, 71, 0.16);
 }
 
 /* =========================================================
@@ -250,9 +370,9 @@
    تصميم كرت الموظف
 ========================================================= */
 .home-page .employee {
-  background: #0c5742;
+  background: linear-gradient(135deg, #0b5f47, #084936);
   color: white;
-  border: 2.5px solid #0a4735;
+  border: 2.5px solid #084936;
 }
 
 .home-page .employee .card-arrow {
@@ -282,5 +402,17 @@
   text-decoration: none;
   font-size: 18px;
 
-  transition: 0.5s;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.home-page .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 65px rgba(15, 23, 42, 0.16);
+}
+
+.card-arrow:hover {
+  transform: translateY(-1px);
 }

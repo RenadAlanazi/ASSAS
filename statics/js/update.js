@@ -16,6 +16,11 @@ const smallUploadBtn = document.querySelector(".small-upload-btn");
 const step1 = document.getElementById("step1");
 const step2 = document.getElementById("step2");
 const step3 = document.getElementById("step3");
+const isEnglish = () => localStorage.getItem("language") === "en"; // Translation improvement added
+
+const translateText = (ar, en) => { // Translation improvement added
+  return isEnglish() ? en : ar;
+};
 
 /* =================================================== STATE/VARIABLES =================================================== */
 const params = new URLSearchParams(window.location.search);
@@ -53,34 +58,34 @@ function updateStatusUI(status) {
   step2.classList.add("active");
   switch (status) {
     case "completed":
-      statusBadgeEl.textContent = "مكتمل";
+      statusBadgeEl.textContent = translateText("مكتمل", "Completed"); // Translation improvement added
       statusBadgeEl.classList.add("completed");
       step3.classList.add("active");
       break;
     case "pending":
-      statusBadgeEl.textContent = "غير مكتمل";
+      statusBadgeEl.textContent = translateText("غير مكتمل", "Pending"); // Translation improvement added
       statusBadgeEl.classList.add("pending");
       break;
     case "in_progress":
-      statusBadgeEl.textContent = "قيد التنفيذ";
+      statusBadgeEl.textContent = translateText("قيد التنفيذ", "In Progress"); // Translation improvement added
       statusBadgeEl.classList.add("progress");
       break;
     default:
-      statusBadgeEl.textContent = "غير معروف";
+      statusBadgeEl.textContent = translateText("غير معروف", "Unknown"); // Translation improvement added
   }
 }
 
 function renderReportImage(imageUrl) {
   reportImageContainer.innerHTML = "";
   if (!imageUrl) {
-    reportImageContainer.innerHTML = '<span class="placeholder-text">لا توجد صورة لهذا البلاغ</span>';
+    reportImageContainer.innerHTML = `<span class="placeholder-text">${translateText("لا توجد صورة لهذا البلاغ", "No photo is available for this report")}</span>`; // Translation improvement added
     return;
   }
   const img = document.createElement("img");
   img.src = imageUrl;
-  img.alt = "صورة البلاغ";
+  img.alt = translateText("صورة البلاغ", "Report Photo"); // Translation improvement added
   img.onerror = () => {
-    reportImageContainer.innerHTML = '<span class="placeholder-text">تعذر تحميل الصورة</span>';
+    reportImageContainer.innerHTML = `<span class="placeholder-text">${translateText("تعذر تحميل الصورة", "Could not load the photo")}</span>`; // Translation improvement added
   };
   reportImageContainer.appendChild(img);
 }
@@ -96,43 +101,43 @@ function lockForm() {
 }
 
 async function getUserName(userId) {
-  if (!userId) return "المهندس";
+  if (!userId) return translateText("المهندس", "Engineer"); // Translation improvement added
 
   try {
     const userSnap = await getDoc(doc(db, "users", userId));
 
     if (userSnap.exists()) {
       const user = userSnap.data();
-      return user.name || user.displayName || user.email || "المهندس";
+      return user.name || user.displayName || user.email || translateText("المهندس", "Engineer"); // Translation improvement added
     }
   }
   catch (error) {
     console.error("User name lookup error:", error);
   }
 
-  return auth.currentUser?.displayName || auth.currentUser?.email || "المهندس";
+  return auth.currentUser?.displayName || auth.currentUser?.email || translateText("المهندس", "Engineer"); // Translation improvement added
 }
 
 function getStatusActivity(status, displayId, engineerName) {
   switch (status) {
     case "in_progress":
       return {
-        message: `تم إسناد البلاغ #${displayId} إلى المهندس ${engineerName}`,
+        message: translateText(`تم إسناد البلاغ #${displayId} إلى المهندس ${engineerName}`, `Report #${displayId} has been assigned to engineer ${engineerName}`), // Translation improvement added
         type: "assign",
       };
     case "completed":
       return {
-        message: `تم إكمال البلاغ #${displayId} بواسطة المهندس ${engineerName}`,
+        message: translateText(`تم إكمال البلاغ #${displayId} بواسطة المهندس ${engineerName}`, `Report #${displayId} has been completed by engineer ${engineerName}`), // Translation improvement added
         type: "complete",
       };
     case "pending":
       return {
-        message: `تم إرجاع البلاغ #${displayId} إلى غير مكتمل بواسطة المهندس ${engineerName}`,
+        message: translateText(`تم إرجاع البلاغ #${displayId} إلى غير مكتمل بواسطة المهندس ${engineerName}`, `Report #${displayId} has been reverted to pending by engineer ${engineerName}`), // Translation improvement added
         type: "revert",
       };
     default:
       return {
-        message: `تم تحديث البلاغ #${displayId} بواسطة المهندس ${engineerName}`,
+        message: translateText(`تم تحديث البلاغ #${displayId} بواسطة المهندس ${engineerName}`, `Report #${displayId} has been updated by engineer ${engineerName}`), // Translation improvement added
         type: "update",
       };
   }
@@ -141,7 +146,7 @@ function getStatusActivity(status, displayId, engineerName) {
 /* =================================================== MAIN LOGIC =================================================== */
 async function loadReport() {
   if (!reportId) {
-    reportIdEl.textContent = "لا يوجد رقم بلاغ";
+    reportIdEl.textContent = translateText("لا يوجد رقم بلاغ", "No report ID"); // Translation improvement added
     lockForm();
     return;
   }
@@ -149,7 +154,7 @@ async function loadReport() {
     const docRef = doc(db, "reports", reportId);
     const snap = await getDoc(docRef);
     if (!snap.exists()) {
-      reportIdEl.textContent = "البلاغ غير موجود";
+      reportIdEl.textContent = translateText("البلاغ غير موجود", "Report not found"); // Translation improvement added
       lockForm();
       return;
     }
@@ -160,7 +165,7 @@ async function loadReport() {
     notesEl.value = report.notes || "";
     renderReportImage(report.image_url || "");
     if (report.completion_image) {
-      fileNameDisplay.textContent = "تم رفع صورة مسبقاً";
+      fileNameDisplay.textContent = translateText("تم رفع صورة مسبقاً", "Image already uploaded"); // Translation improvement added
     }
     const currentStatus = report.status || "pending";
     updateStatusUI(currentStatus);
@@ -169,8 +174,8 @@ async function loadReport() {
       return;
     }
   } catch (error) {
-    console.error("خطأ في تحميل البلاغ:", error);
-    reportIdEl.textContent = "خطأ في تحميل البيانات";
+    console.error("Load error:", error); // Translation improvement added
+    reportIdEl.textContent = translateText("خطأ في تحميل البيانات", "Error loading data"); // Translation improvement added
     lockForm();
   }
 }
@@ -178,27 +183,30 @@ async function loadReport() {
 /* =================================================== EVENT LISTENERS =================================================== */
 completionImageEl.addEventListener("change", () => {
   const file = completionImageEl.files[0];
-  fileNameDisplay.textContent = file ? file.name : "لم يتم اختيار ملف";
+  fileNameDisplay.textContent = file ? file.name : translateText("لم يتم اختيار ملف", "No file selected"); // Translation improvement added
 });
 
 updateBtn.addEventListener("click", async () => {
   if (!reportId) {
-    showToast("لا يوجد رقم بلاغ", "error");
+    showToast(translateText("لا يوجد رقم بلاغ", "No report ID"), "error"); // Translation improvement added
     return;
   }
   const selectedStatus = document.querySelector('input[name="status"]:checked')?.value;
   const notes = notesEl.value.trim();
   const file = completionImageEl.files[0];
   if (!selectedStatus) {
-    showToast("اختر الحالة", "error");
+    showToast(translateText("اختر الحالة", "Select status"), "error"); // Translation improvement added
     return;
   }
   if (selectedStatus === "completed" && !file) {
-    showToast("يجب رفع صورة الإصلاح عند اكتمال البلاغ", "error");
+    showToast(
+      translateText("يجب رفع صورة الإصلاح عند اكتمال البلاغ", "Upload a repair photo before marking the report as completed"), // Translation improvement added
+      "error"
+    );
     return;
   }
   updateBtn.disabled = true;
-  updateBtn.textContent = "جاري التحديث...";
+  updateBtn.textContent = translateText("جاري التحديث...", "Updating..."); // Translation improvement added
   try {
     const docRef = doc(db, "reports", reportId);
     const currentReportSnap = await getDoc(docRef);
@@ -235,13 +243,19 @@ updateBtn.addEventListener("click", async () => {
     if (selectedStatus !== "in_progress") {
       lockForm();
     }
-    showToast("تم تحديث الحالة بنجاح", "complete");
+    showToast(
+      translateText("تم تحديث الحالة بنجاح", "Status updated successfully"), // Translation improvement added
+      "complete"
+    );
   } catch (error) {
     console.error("خطأ في التحديث:", error);
-    showToast("حدث خطأ أثناء التحديث", "error");
+    showToast(
+      translateText("حدث خطأ أثناء التحديث", "The update could not be saved"), // Translation improvement added
+      "error"
+    );
   } finally {
     updateBtn.disabled = false;
-    updateBtn.textContent = "تحديث الحالة";
+    updateBtn.textContent = translateText("تحديث الحالة", "Update Status"); // Translation improvement added
   }
   setTimeout(() => {
     window.location.href = "my_projects.html";

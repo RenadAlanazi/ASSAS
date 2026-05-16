@@ -1,4 +1,3 @@
-
 /* =================================================== IMPORTS =================================================== */
 import { db } from "./firebase.js";
 import {
@@ -13,11 +12,13 @@ from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /* =================================================== CONSTANTS =================================================== */
 const itemsPerPage = 8;
+// Translation improvement added
 const statusTranslation = {
   completed: "مكتمل",
   in_progress: "قيد التنفيذ",
   pending: "غير مكتمل",
 };
+// Translation improvement added
 const severityTranslation = {
   high: "عالية",
   Red: "عالية",
@@ -27,12 +28,23 @@ const severityTranslation = {
   Yellow: "منخفضة",
   Green: "طبيعي",
 };
+// Translation improvement added
 const damageTypeTranslation = {
   pothole: "حفرة",
   crack: "تشقق",
   water: "تجمع مياه",
   normal: "سليم",
 };
+
+const DAMAGE_TYPES = {
+  pothole: { ar: "حفرة", en: "Pothole" },
+  crack: { ar: "تشقق", en: "Crack" },
+  water: { ar: "تجمع مياه", en: "Water Pooling" },
+  normal: { ar: "سليم", en: "Normal" },
+};
+
+// Translation improvement added
+const isEnglish = () => localStorage.getItem("language") === "en";
 
 /* =================================================== STATE/VARIABLES =================================================== */
 let allReports = [];
@@ -68,20 +80,32 @@ const getColor = (report) => {
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
 
-  if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
-  if (["crack", "cracks", "تشقق", "شقوق"].includes(damage)) return "crack";
-  if (["water", "water_pool", "water accumulation", "تجمع مياه"].includes(damage)) return "water";
+  if (["pothole", "hole", "حفرة", "حفره"].includes(damage)) return "pothole";
+  if (["crack", "cracks", "تشقق", "شقوق", "تشققات"].includes(damage)) return "crack";
+  if (["water", "water_pool", "water accumulation", "تجمع مياه", "مياه"].includes(damage)) return "water";
   if (["normal", "safe", "سليم", "طبيعي"].includes(damage)) return "normal";
 
   return damage;
+}
+
+function normalizeSeverity(val) {
+  if (!val) return "";
+
+  val = String(val).toLowerCase();
+
+  if (["high", "red", "عالية"].includes(val)) return "high";
+  if (["medium", "orange", "متوسطة"].includes(val)) return "medium";
+  if (["low", "yellow", "منخفضة"].includes(val)) return "low";
+  if (["green", "طبيعي"].includes(val)) return "green";
+
+  return val;
 }
 
 function getReportDamageType(report) {
   return normalizeDamageType(
     report.damage_type ||
     report.damageType ||
-    report.damage ||
-    report.prediction
+    report.damage
   );
 }
 
@@ -123,7 +147,10 @@ function createChart(id, color) {
           display: function (ctx) {
             return ctx.dataIndex === 0;
           },
-          color: "#000",
+          // Dark mode improvement added
+          color: document.body.classList.contains("dark")
+          ? "#fff"
+          : "#000",
           font: { size: 22, weight: "bold" },
           anchor: "center",
           align: "center",
@@ -146,7 +173,10 @@ function createChart(id, color) {
           const text = Math.round(value) + "%";
           ctx.save();
           ctx.font = `bold ${chart.height / 4.5}px Cairo`;
-          ctx.fillStyle = "#000";
+          // Dark mode improvement added
+          ctx.fillStyle = document.body.classList.contains("dark")
+            ? "#fff"
+            : "#000";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(text, centerX, centerY);
@@ -258,19 +288,30 @@ function renderAllReports() {
         },
       });
 
+      // Dark mode improvement added
+      // Translation improvement added
       const popupContent = `
-<div style="position:relative; width:min(90vw,320px); max-height:80vh; overflow-y:auto; padding:20px; font-family:Cairo; text-align:right; background:white;border-top:6px solid ${getColor(report)}; border-radius:14px; box-shadow:0 15px 35px rgba(0,0,0,0.25);">
-<button id="closePopupBtn" style="position:absolute; top:10px; left:10px; border:none; background:#eee; width:30px; height:30px; border-radius:50%; cursor:pointer;">✕</button>
+<div style="position:relative; width:min(90vw,320px); max-height:80vh; overflow-y:auto; padding:20px; font-family:Cairo; text-align:${isEnglish() ? "left" : "right"}; background:${document.body.classList.contains("dark") ? "#12211c" : "white"};
+color:${document.body.classList.contains("dark") ? "#f1f5f9" : "#000"};border-top:6px solid ${getColor(report)}; border-radius:14px; box-shadow:0 15px 35px rgba(0,0,0,0.25);">
+<button id="closePopupBtn" style="position:absolute; top:10px; ${isEnglish() ? "right" : "left"}:10px; border:none; background:${document.body.classList.contains("dark") ? "#173b32" : "#eee"}; color:${document.body.classList.contains("dark") ? "#fff" : "#000"}; width:30px; height:30px; border-radius:50%; cursor:pointer;">✕</button>
 <h4 style="margin:8px 0; color:#0c5742; font-size:18px">#${report.id.substring(0, 5)}</h4>
-<p style="margin:5px 0;">👤 <b>الموظف:</b> ${employeeName}</p>
-<p style="margin:5px 0;">🧑‍💼 <b>المهندس:</b> ${engineerName}</p>
+<p style="margin:5px 0;">👤 <b>${isEnglish() ? "Employee" : "الموظف"}:</b> ${employeeName}</p>
+<p style="margin:5px 0;">🧑‍💼 <b>${isEnglish() ? "Engineer" : "المهندس"}:</b> ${engineerName}</p>
 <hr style="margin:10px 0; opacity:0.2;" />
-<p style="margin:5px 0;">📅 <b>تاريخ الإنشاء:</b> ${formatDate(createdDate)}</p>
-<p style="margin:5px 0;">📤 <b>تاريخ الإسناد:</b> ${formatDate(assignedDate)}</p>
-<p style="margin:5px 0;">✅ <b>تاريخ الإكتمال:</b> ${formatDate(completedDate)}</p>
+<p style="margin:5px 0;">📅 <b>${isEnglish() ? "Created Date" : "تاريخ الإنشاء"}:</b> ${formatDate(createdDate)}</p>
+<p style="margin:5px 0;">📤 <b>${isEnglish() ? "Assigned Date" : "تاريخ الإسناد"}:</b> ${formatDate(assignedDate)}</p>
+<p style="margin:5px 0;">✅ <b>${isEnglish() ? "Completed Date" : "تاريخ الإكتمال"}:</b> ${formatDate(completedDate)}</p>
 <hr style="margin:10px 0; opacity:0.2;" />
-<p style="margin:5px 0;">📍 <b>الموقع:</b> ${report.street_name || "-"}</p>
-<p style="margin:5px 0;">🚦 <b>الحالة:</b> ${statusTranslation[report.status] || "-"}</p>
+<p style="margin:5px 0;">📍 <b>${isEnglish() ? "Location" : "الموقع"}:</b> ${report.street_name || "-"}</p>
+<p style="margin:5px 0;">🚦 <b>${isEnglish() ? "Status" : "الحالة"}:</b> ${
+  isEnglish()
+    ? {
+        completed: "Completed",
+        in_progress: "In Progress",
+        pending: "Pending",
+      }[report.status] || "-"
+    : statusTranslation[report.status] || "-"
+}</p>
 </div>
 `;
       marker.addListener("click", () => {
@@ -303,6 +344,7 @@ function renderTablePaginated() {
     const color = getColor(report);
     const completedClass = report.status === "completed" ? "row-completed" : "";
 
+    // Translation improvement added
     tableBody.insertAdjacentHTML(
       "beforeend",
       `
@@ -310,10 +352,47 @@ function renderTablePaginated() {
               <td class="focus-col">
                 #${report.id.substring(0, 5)}
               </td>
-              <td>${statusTranslation[report.status] || "-"}</td>
-              <td>${report.street_name || "غير محدد"}</td>
-              <td>${damageTypeTranslation[getReportDamageType(report)] || report.damage_type || report.damageType || report.damage || "-"}</td>
-              <td>${report.prediction_note || report.prediction || "لا يوجد تحليل"}</td>
+              <td>${
+               isEnglish()
+                 ? {
+               completed: "Completed",
+               in_progress: "In Progress",
+               pending: "Pending",
+               }[report.status] || "-"
+               : statusTranslation[report.status] || "-"
+               }</td>
+              <td>${report.street_name || (isEnglish() ? "Not specified" : "غير محدد")}</td>
+            <td>${
+  isEnglish()
+    ? {
+        pothole: "Pothole",
+        crack: "Crack",
+        water: "Water Pooling",
+        normal: "Normal",
+        "حفرة": "Pothole",
+        "تشقق": "Crack",
+        "تجمع مياه": "Water Pooling",
+        "سليم": "Normal"
+      }[
+        getReportDamageType(report)
+      ] || report.damage_type || "-"
+    : damageTypeTranslation[
+        getReportDamageType(report)
+      ] || report.damage_type || "-"
+}</td>
+             <td>${
+  isEnglish()
+    ? {   
+  "مستقر": "Stable",
+  "مستقر أو يتدهور ببطء": "Slow Deterioration",
+  "قد يتفاقم": "Potential Deterioration",
+  "سيتفاقم بمرور الوقت": "Ongoing Deterioration",
+  "سيتفاقم بسرعة": "Rapid Deterioration",
+      }[
+        report.prediction_note || report.prediction
+      ] || "No analysis"
+    : report.prediction_note || report.prediction || "لا يوجد تحليل"
+}</td>
               <td>
                 <span class="status-dot ${color}"></span>
               </td>
@@ -321,7 +400,10 @@ function renderTablePaginated() {
     );
   });
 
-  pageInfo.innerText = `صفحة ${currentPage} من ${totalPages}`;
+  // Translation improvement added
+  pageInfo.innerText = isEnglish()
+  ? `Page ${currentPage} of ${totalPages}`
+  : `صفحة ${currentPage} من ${totalPages}`;
   prevPageBtn.disabled = currentPage === 1;
   nextPageBtn.disabled = currentPage === totalPages;
 }
@@ -351,21 +433,14 @@ function applyFiltersAndSearch() {
       if (!idMatch && !streetMatch) isMatch = false;
     }
 
-    if (severityVal) {
-      const reportSev = String(report.severity || "").toLowerCase();
-      const filterSev = severityVal.toLowerCase();
-      let isSeverityMatch = false;
-
-      if (filterSev === "high" && (reportSev === "high" || reportSev === "red")) {
-        isSeverityMatch = true;
-      } else if (filterSev === "medium" && (reportSev === "medium" || reportSev === "orange")) {
-        isSeverityMatch = true;
-      } else if (filterSev === "low" && (reportSev === "low" || reportSev === "yellow")) {
-        isSeverityMatch = true;
-      }
-
-      if (!isSeverityMatch) isMatch = false;
+    if (
+      severityVal &&
+      normalizeSeverity(report.severity) !==
+        normalizeSeverity(severityVal)
+    ) {
+      isMatch = false;
     }
+
     if (statusVal && report.status !== statusVal) isMatch = false;
     if (damageVal && getReportDamageType(report) !== normalizeDamageType(damageVal)) isMatch = false;
 
@@ -484,15 +559,15 @@ onSnapshot(collection(db, "reports"), (snapshot) => {
 
  allReports.forEach((report) => {
     // نحول النص لحروف صغيرة عشان يتطابق مع الحالات
-    const sev = String(report.severity || "").toLowerCase();
+   const sev = normalizeSeverity(report.severity);
 
-    if (sev === "high" || sev === "red") {
-      counts.high++;
-    } else if (sev === "medium" || sev === "orange") {
-      counts.medium++;
-    } else if (sev === "low" || sev === "yellow") {
-      counts.low++;
-    }
+if (sev === "high") {
+  counts.high++;
+} else if (sev === "medium") {
+  counts.medium++;
+} else if (sev === "low") {
+  counts.low++;
+}
 
     if (report.status === "completed") {
       counts.completed++;
@@ -648,8 +723,10 @@ onSnapshot(q, (snapshot) => {
     empty.className =
       "notification-empty";
 
-    empty.textContent =
-      "لا توجد إشعارات حالياً";
+    // Translation improvement added
+    empty.textContent = isEnglish()
+      ? "No notifications currently"
+      : "لا توجد إشعارات حالياً";
 
     notificationList.appendChild(empty);
     return;
@@ -715,6 +792,9 @@ function formatTime(timestamp) {
 
   const date = timestamp.toDate();
 
-  return date.toLocaleString("ar-SA");
+  // Translation improvement added
+  return isEnglish()
+    ? date.toLocaleString("en-US")
+    : date.toLocaleString("ar-SA");
 
 }

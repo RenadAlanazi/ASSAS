@@ -18,18 +18,19 @@ async function initializeSidebar() {
         const nav = document.getElementById('dynamic-nav');
         
         // 3. تعريف الروابط
+        // Translation improvement added: textEn added to menu items
         const menuItems = {
             employee: [
-                { text: 'لوحة التحكم', icon: 'fa-chart-line', href: 'emp_dashboard.html' },
-                { text: 'رفع بلاغ', icon: 'fa-camera', href: 'upload.html' }, 
-                { text: 'المشاريع', icon: 'fa-folder-open', href: 'projects.html' },
-                { text: 'الصفحة الشخصية', icon: 'fa-user', href: 'profile.html' }
+                { text: 'لوحة التحكم', textEn: 'Dashboard', icon: 'fa-chart-line', href: 'emp_dashboard.html' },
+                { text: 'رفع بلاغ', textEn: 'Upload Report', icon: 'fa-camera', href: 'upload.html' }, 
+                { text: 'المشاريع', textEn: 'Projects', icon: 'fa-folder-open', href: 'projects.html' },
+                { text: 'الصفحة الشخصية', textEn: 'Profile', icon: 'fa-user', href: 'profile.html' }
             ],
             engineer: [
-                { text: 'لوحة التحكم', icon: 'fa-gauge-high', href: 'eng_dashboard.html' },
-                { text: 'مشاريعي', icon: 'fa-list-check', href: 'my_projects.html' },
-                { text: 'تحديث البلاغ', icon: 'fa-pen-to-square', href: 'update.html' }, 
-                { text: 'الصفحة الشخصية', icon: 'fa-user', href: 'profile.html' }
+                { text: 'لوحة التحكم', textEn: 'Dashboard', icon: 'fa-gauge-high', href: 'eng_dashboard.html' },
+                { text: 'مشاريعي', textEn: 'My Projects', icon: 'fa-list-check', href: 'my_projects.html' },
+                { text: 'تحديث البلاغ', textEn: 'Update Report', icon: 'fa-pen-to-square', href: 'update.html' }, 
+                { text: 'الصفحة الشخصية', textEn: 'Profile', icon: 'fa-user', href: 'profile.html' }
             ]
         };
 
@@ -41,9 +42,15 @@ async function initializeSidebar() {
             if (window.location.pathname.includes(item.href)) {
                 li.className = 'active';
             }
-            li.innerHTML = `<a href="${item.href}"><i class="fa-solid ${item.icon}"></i> ${item.text}</a>`;
+            // Translation improvement added: data-ar and data-en attributes for dynamic translation
+            li.innerHTML = `<a href="${item.href}" data-ar="${item.text}" data-en="${item.textEn}"><i class="fa-solid ${item.icon}"></i> ${item.text}</a>`;
             nav.appendChild(li);
         });
+
+        // Translation improvement added: Trigger language sync after sidebar load
+        if (typeof window.applyLanguage === "function") {
+            window.applyLanguage();
+        }
 
         // 5. تفعيل مستمع أحداث تسجيل الخروج
         setupLogoutListener();

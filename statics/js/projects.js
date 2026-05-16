@@ -10,30 +10,76 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { addActivity, showToast } from "./utils.js";
 
+// --------- Translation & Theme Helpers (extracted from source) ---------
+// Retrieve current language, default to Arabic
+function getLang() {
+  return localStorage.getItem("language") || "ar";
+}
+// Shortcut to check if language is English
+const isEnglish = () => getLang() === "en";
+// Generic translation helper (mirrors existing translate function)
+function translateText(ar, en) {
+  return isEnglish() ? en : ar;
+}
+// Apply saved theme (dark/light) on page load
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+}
+// Dark mode improvement added
+// Translation improvement added
+
 /* =================================================== CONSTANTS =================================================== */
-const statusTranslation = {
-  completed: "مكتمل",
-  in_progress: "قيد التنفيذ",
-  pending: "غير مكتمل",
-};
+function translateSeverity(val) {
+  const key = String(val || "").toLowerCase();
 
-const severityTranslation = {
-  high: "عالية",
-  Red: "عالية",
-  red: "عالية",
-  medium: "متوسطة",
-  Orange: "متوسطة",
-  orange: "متوسطة",
-  low: "منخفضة",
-  Yellow: "منخفضة"
-};
+  const map = {
+    high: { ar: "عالية", en: "High" },
+    red: { ar: "عالية", en: "High" },
+    medium: { ar: "متوسطة", en: "Medium" },
+    orange: { ar: "متوسطة", en: "Medium" },
+    low: { ar: "منخفضة", en: "Low" },
+    yellow: { ar: "منخفضة", en: "Low" }
+  };
 
-const damageTypeTranslation = {
-  pothole: "حفرة",
-  crack: "تشقق",
-  water: "تجمع مياه",
-  normal: "سليم"
-};
+  return map[key]?.[isEnglish() ? "en" : "ar"] || "-";
+}
+
+function translateStatus(val) {
+  const map = {
+    completed: { ar: "مكتمل", en: "Completed" },
+    in_progress: { ar: "قيد التنفيذ", en: "In Progress" },
+    pending: { ar: "غير مكتمل", en: "Pending" }
+  };
+
+  return map[val]?.[isEnglish() ? "en" : "ar"] || "-";
+}
+
+function translateDamageType(val) {
+  const key = normalizeDamageType(val);
+  const map = {
+    pothole: { ar: "حفرة", en: "Pothole" },
+    crack: { ar: "تشقق", en: "Crack" },
+    water: { ar: "تجمع مياه", en: "Water Pooling" },
+    normal: { ar: "سليم", en: "Normal" }
+  };
+  return map[key]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
+
+function translatePrediction(val) {
+  const map = {
+    "مستقر": { ar: "مستقر", en: "Stable" },
+    "مستقر أو يتدهور ببطء": { ar: "مستقر أو يتدهور ببطء", en: "Slow Deterioration" },
+    "قد يتفاقم": { ar: "قد يتفاقم", en: "Potential Deterioration" },
+    "سيتفاقم بمرور الوقت": { ar: "سيتفاقم بمرور الوقت", en: "Ongoing Deterioration" },
+    "سيتفاقم بسرعة": { ar: "سيتفاقم بسرعة", en: "Rapid Deterioration" }
+  };
+  return map[val]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
 
 /* =================================================== STATE/VARIABLES =================================================== */
 const tableBody = document.getElementById("tableBody");
@@ -71,12 +117,23 @@ const formatDate = (date) => {
 // دالة توحيد مسميات الأضرار (لحل مشكلة اختلاف اللغات في الفلتر)
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
-  if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
-  if (["crack", "cracks", "تشقق", "شقوق"].includes(damage)) return "crack";
-  if (["water", "water_pool", "water accumulation", "تجمع مياه"].includes(damage)) return "water";
+
+  if (["pothole", "hole", "حفرة", "حفره"].includes(damage)) return "pothole";
+  if (["crack", "cracks", "تشقق", "شقوق", "تشققات"].includes(damage)) return "crack";
+  if (["water", "water_pool", "water accumulation", "تجمع مياه", "مياه"].includes(damage)) return "water";
   if (["normal", "safe", "سليم", "طبيعي"].includes(damage)) return "normal";
+
   return damage;
 }
+
+function getReportDamageType(report) {
+  return normalizeDamageType(
+    report.damage_type ||
+    report.damageType ||
+    report.damage
+  );
+}
+
 
 const getCurrentUserId = () => {
   try {
@@ -165,7 +222,7 @@ const applyFiltersAndSearch = () => {
 
     // --- تعديل فلتر نوع الضرر (Damage Type Filter) ---
     if (damageTypeVal) {
-      const reportType = normalizeDamageType(report.damage_type || report.prediction || "");
+      const reportType = getReportDamageType(report);
       const selectedType = normalizeDamageType(damageTypeVal);
       if (reportType !== selectedType) match = false;
     }
@@ -234,8 +291,8 @@ const renderTablePaginated = () => {
           ` : ""}
         </td>
         <td class="focus-col">#${report.id.substring(0, 5)}</td>
-        <td>${statusTranslation[report.status] || "-"}</td>
-        <td>${report.street_name || "غير محدد"}</td>
+        <td>${translateStatus(report.status)}</td>
+        <td>${report.street_name || translateText("غير محدد", "Not specified")}</td>
         <td>${formatDate(createdDate)}</td>
         <td>${formatDate(assignedDate)}</td>
         <td>${formatDate(completionDate)}</td>
@@ -282,15 +339,15 @@ const renderDetails = (report) => {
   reportDetailsCard.innerHTML = `
     <div class="details-info">
       <div class="details-info-header">
-        <h3>رقم البلاغ: #${report.id.substring(0, 5)}...</h3>
+        <h3>${translateText("رقم البلاغ", "Report ID")}: #${report.id.substring(0, 5)}...</h3>
       </div>
       <div class="info-grid">
-        <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>الموقع: ${report.street_name || "غير محدد"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-user"></i> <span>الموظف: ${usersMap[report.created_by]?.name || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>المهندس: ${usersMap[report.assigned_to]?.name || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[normalizeDamageType(report.damage_type || report.prediction)] || report.damage_type || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>الخطورة: ${severityTranslation[report.severity] || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-brain"></i> <span>التنبؤ: ${report.prediction || report.prediction_note || "-"}</span></div>
+        <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>${translateText("الموقع", "Location")}: ${report.street_name || translateText("غير محدد", "Not specified")}</span></div>
+        <div class="info-item"><i class="fa-solid fa-user"></i> <span>${translateText("الموظف", "Employee")}: ${usersMap[report.created_by]?.name || "-"}</span></div>
+        <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>${translateText("المهندس", "Engineer")}: ${usersMap[report.assigned_to]?.name || "-"}</span></div>
+        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>${translateText("الضرر", "Damage")}: ${translateDamageType(report.damage_type || report.prediction)}</span></div>
+        <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>${translateText("الخطورة", "Severity")}: ${translateSeverity(report.severity)}</span></div>
+        <div class="info-item"><i class="fa-solid fa-brain"></i> <span>${translateText("التنبؤ", "Prediction")}: ${translatePrediction(report.prediction || report.prediction_note)}</span></div>
       </div>
     </div>
     ${imageHTML}
@@ -299,8 +356,8 @@ const renderDetails = (report) => {
 
 const deleteReport = async (id) => {
   const confirmed = await showConfirmModal(
-    "حذف البلاغ؟",
-    "سيتم حذف البلاغ نهائيًا من النظام"
+    translateText("حذف البلاغ؟", "Delete Report?"),
+    translateText("سيتم حذف البلاغ نهائيًا من النظام", "This report will be permanently deleted from the system")
   );
   if (!confirmed) return;
   try {
@@ -310,12 +367,12 @@ const deleteReport = async (id) => {
       "delete",
       { reportId: id }
     );
-    showToast("تم حذف البلاغ", "delete");
+    showToast(translateText("تم حذف البلاغ", "Report deleted"), "delete");
     if (reportDetailsCard.innerHTML.includes(id.substring(0, 5))) {
       reportDetailsCard.classList.add("hidden");
     }
   } catch (err) {
-    showToast("حدث خطأ أثناء عملية الحذف", "error");
+    showToast(translateText("حدث خطأ أثناء عملية الحذف", "Error occurred during deletion"), "error");
   }
 };
 
@@ -337,9 +394,9 @@ const completeReport = async (id) => {
         targetUserId: engineerId,
       }
     );
-    showToast("تم تغير حالة البلاغ إلى 'مكتمل'", "complete");
+    showToast(translateText("تم تغير حالة البلاغ إلى 'مكتمل'", "Report status changed to 'Completed'"), "complete");
   } catch (err) {
-    showToast("فشل في عملية إكمال البلاغ", "error");
+    showToast(translateText("فشل في عملية إكمال البلاغ", "Failed to complete report"), "error");
   }
 };
 
@@ -438,9 +495,9 @@ tableBody.addEventListener("click", async (e) => {
     targetUserId: engineerId,
   }
 );
-      showToast("تم تغيير حالة البلاغ إلى 'غير مكتمل'", "revert");
+      showToast(translateText("تم تغيير حالة البلاغ إلى 'غير مكتمل'", "Report status changed to 'Pending'"), "revert");
     } catch (err) {
-      showToast("فشل في عملية تغيير حالة البلاغ", "error");
+      showToast(translateText("فشل في عملية تغيير حالة البلاغ", "Failed to change report status"), "error");
     }
     return;
   }
@@ -462,10 +519,10 @@ tableBody.addEventListener("click", async (e) => {
           targetUserId: el.dataset.user,
         }
       );
-      showToast(`تم إسناد البلاغ للمهندس ${engineerName}`, "assign");
+      showToast(translateText(`تم إسناد البلاغ للمهندس ${engineerName}`, `Report assigned to engineer ${engineerName}`), "assign");
       el.closest(".assign-menu").classList.add("hidden");
     } catch (err) {
-      showToast("فشل الإسناد", "error");
+      showToast(translateText("فشل الإسناد", "Assignment failed"), "error");
     }
     return;
   }
@@ -508,5 +565,8 @@ onSnapshot(collection(db, "reports"), (snapshot) => {
     id: docSnap.id,
     ...docSnap.data(),
   }));
+  applyTheme(); // Apply saved theme at initialization
   applyFiltersAndSearch();
 });
+// Initialization complete
+// Dark mode improvement added

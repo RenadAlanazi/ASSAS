@@ -1,9 +1,14 @@
 /* CONSTANTS */
 :root {
-  --green: #0c5742;
-  --bg: #f7f9f7;
+  --green: #0b5f47;
+  --green-dark: #084936;
+  --green-soft: #eaf7f1;
+  --bg: #f5f8f6;
   --card: #ffffff;
-  --text: #222;
+  --text: #1f2f2a;
+  --border: #dfe9e4;
+  --shadow-sm: 0 6px 18px rgba(12, 87, 66, 0.06);
+  --shadow-md: 0 14px 34px rgba(12, 87, 66, 0.1);
 }
 
 /* STATE/VARIABLES */
@@ -63,24 +68,43 @@ aside ul li.active {
 body {
   margin: 0;
   font-family: "Cairo", sans-serif;
-  background: var(--bg);
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(12, 95, 71, 0.08),
+      transparent 32%
+    ),
+    linear-gradient(180deg, #fbfdfc 0%, var(--bg) 42%, #eef5f1 100%);
   color: var(--text);
 }
 .container {
   display: flex;
   min-height: 100vh;
 }
+* {
+  box-sizing: border-box;
+}
+
 aside {
   width: 240px;
-  background: var(--green);
+  min-width: 240px;
+  max-width: 240px;
+  box-sizing: border-box;
+
+  background: linear-gradient(180deg, var(--green), var(--green-dark));
   color: white;
+
   padding: 25px 18px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
-  height: 100%;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
+
 aside img {
   width: 150px;
   margin-bottom: 40px;
@@ -94,7 +118,9 @@ aside ul li {
   padding: 12px 15px;
   border-radius: 8px;
   margin-bottom: 10px;
-  transition: 0.3s;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
 }
 aside ul li a {
   color: inherit;
@@ -117,9 +143,14 @@ aside ul li a {
   display: flex;
   align-items: center;
   gap: 12px;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 main {
   flex: 1;
+  min-width: 0;
   padding: 25px;
   display: flex;
   flex-direction: column;
@@ -131,13 +162,15 @@ main {
   margin-bottom: 25px;
 }
 .search-box {
-  background: var(--card);
+  background: rgba(255, 255, 255, 0.94);
   padding: 10px 18px;
   border-radius: 25px;
   width: 350px;
   display: flex;
   align-items: center;
   gap: 10px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 .search-box input {
   font-family: "Cairo";
@@ -153,11 +186,16 @@ main {
   margin-bottom: 25px;
 }
 .card {
-  background: var(--card);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
   padding: 20px;
   border-radius: 14px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(12, 87, 66, 0.08);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 table {
   width: 100%;
@@ -165,16 +203,18 @@ table {
   background: var(--card);
   border-radius: 14px;
   overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 thead {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
   color: white;
 }
 th,
 td {
   padding: 14px;
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #edf2ef;
 }
 .filter-section {
   margin-bottom: 25px;
@@ -203,28 +243,36 @@ td {
   font-family: inherit;
   font-size: 14px;
   outline: none;
-  transition: 0.3s;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
   background: #fff;
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.02);
 }
 .filter-actions {
   display: flex;
   gap: 10px;
 }
 .filter-btn {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.3s;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
   height: 42px;
+  box-shadow: 0 10px 20px rgba(12, 87, 66, 0.18);
 }
 .reset-btn {
-  background: #f1f1f1;
-  color: #333;
-  border: 1px solid #ddd;
+  background: #f7faf8;
+  color: #33443e;
+  border: 1px solid var(--border);
   font-family: "Cairo";
 }
 .action-btn {
@@ -234,7 +282,10 @@ td {
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .pagination {
   display: flex;
@@ -253,7 +304,11 @@ td {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.3s;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .page-info {
   font-weight: 600;
@@ -264,8 +319,9 @@ td {
   margin-bottom: 25px;
   padding: 24px;
   border-radius: 12px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+  border: 1px solid rgba(12, 87, 66, 0.08);
+  box-shadow: var(--shadow-md);
   display: flex;
   gap: 30px;
   align-items: center;
@@ -286,7 +342,7 @@ td {
 }
 .details-info-header p {
   margin: 0;
-  color: #777;
+  color: #66746f;
   font-size: 14px;
 }
 .info-grid {
@@ -309,10 +365,11 @@ td {
   align-items: center;
   gap: 8px;
   font-size: 15px;
-  color: #333;
+  color: #32423d;
   padding: 10px 12px;
   border-radius: 8px;
-  background: #f9f9f9;
+  background: #f7faf8;
+  border: 1px solid #edf2ef;
 }
 .info-item i {
   color: var(--green);
@@ -335,7 +392,7 @@ td {
   position: relative;
   transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
   transform-style: preserve-3d;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
   border-radius: 10px;
 }
 .details-front,
@@ -362,20 +419,26 @@ td {
 /* EVENT LISTENERS */
 aside ul li:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
 }
 .logout-btn:hover {
   background: #c9302c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(201, 48, 44, 0.2);
 }
 .filter-group input:focus,
 .filter-group select:focus {
   border-color: var(--green);
-  box-shadow: 0 0 5px rgba(12, 87, 66, 0.2);
+  box-shadow: 0 0 0 4px rgba(12, 95, 71, 0.12);
 }
 .filter-btn:hover {
-  background: #094534;
+  background: linear-gradient(135deg, #0e7557, var(--green-dark));
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(12, 87, 66, 0.24);
 }
 .reset-btn:hover {
-  background: #e2e2e2;
+  background: #edf5f1;
+  border-color: #cbdad4;
 }
 .action-btn:hover {
   background: #d9b53c;
@@ -383,6 +446,8 @@ aside ul li:hover {
 .page-btn:hover:not(:disabled) {
   background: var(--green);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(12, 87, 66, 0.16);
 }
 .page-btn:disabled {
   border-color: #ccc;

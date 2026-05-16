@@ -24,6 +24,11 @@ const damageTypeTranslation = {
   normal: "سليم",
 };
 const itemsPerPage = 8;
+const isEnglish = () => localStorage.getItem("language") === "en";
+
+const translateText = (ar, en) => {
+  return isEnglish() ? en : ar;
+};
 
 /* =================================================== STATE/VARIABLES =================================================== */
 let allReports = [];
@@ -115,6 +120,94 @@ function showToast(message, type = "assign") {
   setTimeout(() => toast.remove(), 3000);
 }
 
+const getPredictionText = (report) => {
+  const val = report.prediction_note || report.prediction;
+  if (isEnglish()) {
+    const map = {
+      "مستقر": "Stable",
+      "مستقر أو يتدهور ببطء": "Slow Deterioration",
+      "قد يتفاقم": "Potential Deterioration",
+      "سيتفاقم بمرور الوقت": "Ongoing Deterioration",
+      "سيتفاقم بسرعة": "Rapid Deterioration",
+    };
+    return map[val] || val || "No analysis";
+  }
+  return val || "لا يوجد تحليل";
+};
+
+/* =================================================== NOTIFICATION HELPERS =================================================== */
+const notificationIcons = {
+  complete: "fa-check",
+  success: "fa-check",
+  upload: "fa-cloud-arrow-up",
+  assign: "fa-user-plus",
+  revert: "fa-rotate-left",
+  delete: "fa-trash",
+  error: "fa-triangle-exclamation",
+  update: "fa-pen-to-square",
+  general: "fa-bell",
+};
+
+const notificationTypes = new Set(Object.keys(notificationIcons));
+const readNotificationStorageKey = "assasReadNotificationIds_Eng"; // Using unique key for engineer dashboard
+const notificationLifetimeMs = 7 * 24 * 60 * 60 * 1000;
+let currentNotificationIds = [];
+
+function getReadNotificationIds() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(readNotificationStorageKey)) || []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function saveReadNotificationIds(ids) {
+  localStorage.setItem(readNotificationStorageKey, JSON.stringify([...ids]));
+}
+
+function getNotificationDate(timestamp) {
+  if (!timestamp) return null;
+  if (typeof timestamp.toDate === "function") return timestamp.toDate();
+  const date = new Date(timestamp);
+  return isNaN(date.getTime()) ? null : date;
+}
+
+function isExpiredNotification(data) {
+  const createdAt = getNotificationDate(data.createdAt);
+  return createdAt && Date.now() - createdAt.getTime() > notificationLifetimeMs;
+}
+
+function updateNotificationBadge() {
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationCount = document.getElementById("notificationCount");
+  if (!notificationCount) return;
+
+  const readIds = getReadNotificationIds();
+  const unreadCount = currentNotificationIds.filter((id) => !readIds.has(id)).length;
+
+  notificationCount.textContent = unreadCount;
+  notificationCount.classList.toggle("hidden", unreadCount === 0);
+  notificationBtn?.classList.toggle("has-unread", unreadCount > 0);
+}
+
+function markNotificationsAsRead() {
+  const readIds = getReadNotificationIds();
+  currentNotificationIds.forEach((id) => readIds.add(id));
+  saveReadNotificationIds(readIds);
+  updateNotificationBadge();
+}
+
+function getNotificationType(type) {
+  return notificationTypes.has(type) ? type : "general";
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return "";
+  const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+  if (isNaN(date.getTime())) return "";
+  return isEnglish() ? date.toLocaleString("en-US") : date.toLocaleString("ar-SA");
+}
+
 /* =================================================== MAIN LOGIC =================================================== */
 class CustomPopup extends google.maps.OverlayView {
   constructor(position, content) {
@@ -158,18 +251,49 @@ function buildPopupContent(report) {
   const employeeName = usersMap[report.created_by] || "-";
   const safeId = report.id ? report.id.substring(0, 5) : "-";
   return `
-    <div style="position:relative;width:min(90vw,320px);max-height:80vh;overflow-y:auto;padding:20px;font-family:Cairo;text-align:right;background:white;border-top:6px solid ${getColor(report)};border-radius:14px;box-shadow:0 15px 35px rgba(0,0,0,0.25);">
-      <button id="closePopupBtn" style="position:absolute;top:10px;left:10px;border:none;background:#eee;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-      ${report.image_url ? `<img src="${report.image_url}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:10px;" onerror="this.style.display='none'" />` : ""}
-      <h4 style="margin:8px 0; color:#0c5742; font-size:18px">#${safeId}</h4>
-      <p style="margin:5px 0;">👤 <b>الموظف:</b> ${employeeName}</p>
-      <p style="margin:5px 0;">🚦 <b>الحالة:</b> ${statusTranslation[report.status] || "-"}</p>
-      <hr style="margin:10px 0; opacity:0.2;" />
-      <p style="margin:5px 0;">📍 <b>الموقع:</b> ${report.street_name || "-"}</p>
-      <p style="margin:5px 0;">⚠️ <b>الخطورة :</b> ${severityTranslation[report.severity] || "-"}</p>
-      <p style="margin:5px 0;">🤖 <b>التنبؤ :</b> ${report.prediction_note || report.prediction || "لا يوجد تحليل"}</p>
-    </div>
-  `;
+ <div style="position:relative;width:min(90vw,320px);max-height:80vh;overflow-y:auto;padding:20px;font-family:Cairo;text-align:${isEnglish() ? "left" : "right"};background:${document.body.classList.contains("dark") ? "#12211c" : "white"};color:${document.body.classList.contains("dark") ? "#f1f5f9" : "#000"};border-top:6px solid ${getColor(report)};border-radius:14px;box-shadow:0 15px 35px rgba(0,0,0,0.25);">
+  <button id="closePopupBtn" style="position:absolute;top:10px;${isEnglish() ? "right" : "left"}:10px;border:none;background:${document.body.classList.contains("dark") ? "#173b32" : "#eee"};color:${document.body.classList.contains("dark") ? "#fff" : "#000"};width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
+
+  ${report.image_url ? `<img src="${report.image_url}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:10px;" onerror="this.style.display='none'" />` : ""}
+
+  <h4 style="margin:8px 0; color:#0c5742; font-size:18px">#${safeId}</h4>
+
+  <p style="margin:5px 0;">👤 <b>${translateText("الموظف", "Employee")}:</b> ${employeeName}</p>
+
+  <p style="margin:5px 0;">🚦 <b>${translateText("الحالة", "Status")}:</b> ${
+    isEnglish()
+      ? {
+          pending: "Pending",
+          in_progress: "In Progress",
+          completed: "Completed"
+        }[report.status] || "-"
+      : statusTranslation[report.status] || "-"
+  }</p>
+
+  <hr style="margin:10px 0; opacity:0.2;" />
+
+  <p style="margin:5px 0;">📍 <b>${translateText("الموقع", "Location")}:</b> ${report.street_name || "-"}</p>
+
+  <p style="margin:5px 0;">⚠️ <b>${translateText("الخطورة", "Severity")}:</b> ${
+    isEnglish()
+      ? {
+          high: "High",
+          Red: "High",
+          red: "High",
+          medium: "Medium",
+          Orange: "Medium",
+          orange: "Medium",
+          low: "Low",
+          Yellow: "Low"
+        }[report.severity] || "-"
+      : severityTranslation[
+          normalizeSeverity(report.severity)
+        ] || "-"
+  }</p>
+
+  <p style="margin:5px 0;">🤖 <b>${translateText("التنبؤ", "Prediction")}:</b> ${getPredictionText(report)}</p>
+</div>
+ `;
 }
 
 function renderMapMarkers() {
@@ -217,21 +341,57 @@ function renderTablePaginated() {
     const safeId = report.id ? report.id.substring(0, 5) : "-";
     return `
       <tr data-id="${report.id}" style="cursor: pointer;">
-        <td>
-          <button class="action-btn assign-btn" aria-label="إسناد التقرير">
-            <i class="fa-solid fa-user-plus"></i>
-          </button>
-        </td>
-        <td class="focus-col">#${safeId}</td>
-        <td>${formatDate(createdDate)}</td>
-        <td>${report.street_name || "غير محدد"}</td>
-        <td>${damageTypeTranslation[normalizeDamageType(report.damage_type || report.prediction)] || report.damage_type || "-"}</td>
-        <td><span class="status-dot ${color}"></span></td>
-        <td>${report.prediction_note || report.prediction || "لا يوجد تحليل"}</td>
-      </tr>
-    `;
+<td>
+    <button 
+      class="action-btn assign-btn" 
+      aria-label="${translateText("إسناد التقرير", "Assign report")}"
+    >
+      <i class="fa-solid fa-user-plus"></i>
+    </button>
+  </td>
+
+  <td class="focus-col" style="cursor: pointer;">#${safeId}</td>
+
+  <td>${formatDate(createdDate)}</td>
+
+  <td>${report.street_name || translateText("غير محدد", "Not specified")}</td>
+
+<td>${
+  isEnglish()
+    ? {
+        pothole: "Pothole",
+        crack: "Crack",
+        water: "Water Pooling",
+        normal: "Normal",
+        "حفرة": "Pothole",
+        "تشقق": "Crack",
+        "تجمع مياه": "Water Pooling",
+        "سليم": "Normal"
+      }[
+        normalizeDamageType(report.damage_type)
+      ] || report.damage_type || "-"
+    : damageTypeTranslation[
+        normalizeDamageType(report.damage_type)
+      ] || report.damage_type || "-"
+}</td>
+<td>${getPredictionText(report)}</td>
+  <td><span class="status-dot tooltip ${color}"></span></td>
+</tr>
+`;
   }).join("");
   tableBody.insertAdjacentHTML("beforeend", rowsHtml);
+const pageInfo = document.getElementById("pageInfo");
+const totalPagesCount = Math.max(1, Math.ceil(filteredReports.length / itemsPerPage));
+
+if (pageInfo) {
+  pageInfo.innerText = translateText(
+    `صفحة ${currentPage} من ${totalPagesCount}`,
+    `Page ${currentPage} of ${totalPagesCount}`
+  );
+}
+
+prevPageBtn.disabled = currentPage === 1;
+nextPageBtn.disabled = currentPage === totalPagesCount;
 }
 
 function applyFiltersAndSearchCore() {
@@ -325,7 +485,7 @@ function createChart(id, color) {
         tooltip: { enabled: false },
         datalabels: {
           display: (context) => context.dataIndex === 0,
-          color: "#000",
+          color: document.body.classList.contains("dark") ? "#fff" : "#000",
           font: { size: 22, weight: "bold" },
           anchor: "center",
           align: "center",
@@ -345,7 +505,7 @@ function createChart(id, color) {
         const text = Math.round(value) + "%";
         ctx.save();
         ctx.font = `bold ${chart.height / 4.5}px Cairo`;
-        ctx.fillStyle = "#000";
+        ctx.fillStyle = document.body.classList.contains("dark") ? "#fff" : "#000";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(text, centerX, centerY);
@@ -354,6 +514,7 @@ function createChart(id, color) {
     }],
   });
 }
+
 
 function updateChartDataSafe(chart, value, total) {
   if (chart && chart.data?.datasets?.length) {
@@ -475,13 +636,84 @@ function initNotifications() {
   const notificationPanel = document.getElementById("notificationPanel");
   const notificationList = document.getElementById("notificationList");
   const notificationCount = document.getElementById("notificationCount");
+
   if (!notificationBtn || !notificationPanel || !notificationList || !notificationCount) return;
-  
+
   notificationBtn.addEventListener("click", () => {
     notificationPanel.classList.toggle("hidden");
+    if (!notificationPanel.classList.contains("hidden")) {
+      markNotificationsAsRead();
+    }
   });
-  // تم اختصار دالة الإشعارات هنا لتعمل بشكل أساسي
+
+  const q = query(collection(db, "activity_logs"), orderBy("createdAt", "desc"));
+
+  onSnapshot(q, (snapshot) => {
+    const freshDocs = [];
+    snapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data();
+      
+      // Cleanup expired notifications
+      if (isExpiredNotification(data)) {
+        deleteDoc(doc(db, "activity_logs", docSnap.id)).catch(() => {});
+        return;
+      }
+
+      // Filter for current engineer only
+      if (data.targetUserId && data.targetUserId !== auth.currentUser?.uid) {
+        return;
+      }
+      
+      freshDocs.push(docSnap);
+    });
+
+    currentNotificationIds = freshDocs.map((docSnap) => docSnap.id);
+    const readIds = getReadNotificationIds();
+
+    notificationList.innerHTML = "";
+    updateNotificationBadge();
+
+    if (freshDocs.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "notification-empty";
+      empty.textContent = translateText("لا توجد إشعارات حالياً", "No notifications currently");
+      notificationList.appendChild(empty);
+      return;
+    }
+
+    freshDocs.forEach((docSnap) => {
+      const data = docSnap.data();
+      const type = getNotificationType(data.type);
+      const isUnread = !readIds.has(docSnap.id);
+
+      const div = document.createElement("div");
+      div.className = `notification-item ${type}${isUnread ? " unread" : ""}`;
+
+      const icon = document.createElement("div");
+      icon.className = "notification-icon";
+      icon.innerHTML = `<i class="fa-solid ${notificationIcons[type]}"></i>`;
+
+      const content = document.createElement("div");
+      content.className = "notification-content";
+
+      const title = document.createElement("div");
+      title.className = "notification-title";
+      title.textContent = data.message || "";
+
+      const time = document.createElement("div");
+      time.className = "notification-time";
+      time.textContent = formatTime(data.createdAt);
+
+      content.appendChild(title);
+      content.appendChild(time);
+      div.appendChild(icon);
+      div.appendChild(content);
+
+      notificationList.appendChild(div);
+    });
+  });
 }
+
 
 function initCharts() {
   totalChart = createChart("totalChart", "#9b59b6");

@@ -26,6 +26,8 @@
 
     <!-- style sheet -->
     <link rel="stylesheet" href="../statics/css/upload.css" />
+    <!-- Injected dark theme support -->
+    <link rel="stylesheet" href="../statics/css/settings.css" />
 
     <!-- bootstrap -->
     <link
@@ -47,28 +49,43 @@
         <div class="content-grid">
           <!-- Inputs -->
           <div class="form-box">
+            <!-- Injected translated placeholders -->
             <input
               type="text"
               id="streetName"
               class="form-control mb-2"
               placeholder="اسم الشارع"
+              data-placeholder-ar="اسم الشارع"
+              data-placeholder-en="Street Name"
             />
 
+            <!-- Injected translated placeholders -->
             <input
               type="number"
               id="latitude"
               class="form-control mb-2"
               placeholder="خط العرض"
+              data-placeholder-ar="خط العرض"
+              data-placeholder-en="Latitude"
             />
 
+            <!-- Injected translated placeholders -->
             <input
               type="number"
               id="longitude"
               class="form-control mb-2"
               placeholder="خط الطول"
+              data-placeholder-ar="خط الطول"
+              data-placeholder-en="Longitude"
             />
 
-            <button id="submitBtn" class="btn btn-success mt-3">
+            <!-- Injected translation support -->
+            <button
+              id="submitBtn"
+              class="btn btn-success mt-3"
+              data-ar="إرسال البلاغ"
+              data-en="Submit Report"
+            >
               إرسال البلاغ
             </button>
           </div>
@@ -83,9 +100,24 @@
                       d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
                     ></path>
                   </svg>
-                  <p id="fileNameDisplay">اسحب الملف هنا</p>
-                  <p>أو</p>
-                  <span class="browse-button">اختر ملف</span>
+                  <!-- Injected translation support -->
+                  <p
+                    id="fileNameDisplay"
+                    data-ar="اسحب الملف هنا"
+                    data-en="Drag a photo here"
+                  >
+                    اسحب الملف هنا
+                  </p>
+                  <!-- Injected translation support -->
+                  <p data-ar="أو" data-en="or">أو</p>
+                  <!-- Injected translation support -->
+                  <span
+                    class="browse-button"
+                    data-ar="اختر ملف"
+                    data-en="Choose Photo"
+                  >
+                    اختر ملف
+                  </span>
                 </div>
                 <input id="fileInput" type="file" accept="image/*" />
               </label>
@@ -114,5 +146,7 @@
       crossorigin="anonymous"
     ></script>
     <script type="module" src="../statics/js/loadSidebar.js"></script>
+    <!-- Injected settings integration for dark mode and translations -->
+    <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

@@ -23,6 +23,8 @@
     />
 
     <link rel="stylesheet" href="../statics/css/update.css" />
+    <!-- Injected dark theme support -->
+    <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
 
   <body>
@@ -34,7 +36,15 @@
         <section class="update-card">
           <div class="top-row">
             <h2 id="reportId" class="report-id">#---</h2>
-            <span id="statusBadge" class="status-badge">جاري التحميل...</span>
+            <!-- Injected translation support -->
+            <span
+              id="statusBadge"
+              class="status-badge"
+              data-ar="جاري التحميل..."
+              data-en="Loading..."
+            >
+              جاري التحميل...
+            </span>
           </div>
 
           <div class="progress-wrap">
@@ -47,53 +57,88 @@
 
           <div class="content-grid">
             <div class="report-side">
-              <h3>الصورة المتضررة</h3>
+              <!-- Injected translation support -->
+              <h3 data-ar="الصورة المتضررة" data-en="Damage Photo">الصورة المتضررة</h3>
               <div id="reportImageContainer" class="report-image-box">
-                <span class="placeholder-text">جاري تحميل الصورة...</span>
+                <!-- Injected translation support -->
+                <span
+                  class="placeholder-text"
+                  data-ar="جاري تحميل الصورة..."
+                  data-en="Loading image..."
+                >
+                  جاري تحميل الصورة...
+                </span>
               </div>
             </div>
 
             <div class="upload-side">
-              <h3>الصورة بعد الإصلاح</h3>
+              <!-- Injected translation support -->
+              <h3 data-ar="الصورة بعد الإصلاح" data-en="Repair Photo">الصورة بعد الإصلاح</h3>
 
               <div class="small-upload-row">
-                <label for="completionImage" class="small-upload-btn">
+                <!-- Injected translation support -->
+                <label
+                  for="completionImage"
+                  class="small-upload-btn"
+                  data-ar="اختر صورة"
+                  data-en="Choose Photo"
+                >
                   <i class="fa-solid fa-image"></i>
                   اختر صورة
                 </label>
                 <input id="completionImage" type="file" accept="image/*" />
-                <span id="fileNameDisplay" class="file-name"
-                  >لم يتم اختيار ملف</span
+                <!-- Injected translation support -->
+                <span
+                  id="fileNameDisplay"
+                  class="file-name"
+                  data-ar="لم يتم اختيار ملف"
+                  data-en="No file selected"
                 >
+                  لم يتم اختيار ملف
+                </span>
               </div>
             </div>
           </div>
 
           <div class="status-section">
-            <h3>الحالة</h3>
+            <!-- Injected translation support -->
+            <h3 data-ar="الحالة" data-en="Status">الحالة</h3>
             <div class="radio-group">
               <label class="radio-option">
                 <input type="radio" name="status" value="completed" />
-                مكتمل
+                <!-- Injected translation support -->
+                <span data-ar="مكتمل" data-en="Completed">مكتمل</span>
               </label>
 
               <label class="radio-option">
                 <input type="radio" name="status" value="pending" />
-                تنازل
+                <!-- Injected translation support -->
+                <span data-ar="تنازل" data-en="Dismissed">تنازل</span>
               </label>
             </div>
           </div>
 
           <div class="notes-section">
-            <label for="notes">ملاحظات</label>
+            <!-- Injected translation support -->
+            <label for="notes" data-ar="ملاحظات" data-en="Notes">ملاحظات</label>
+            <!-- Injected translated placeholders -->
             <textarea
               id="notes"
               placeholder="اكتب ملاحظات المهندس هنا..."
+              data-placeholder-ar="اكتب ملاحظات المهندس هنا..."
+              data-placeholder-en="Add engineer notes..."
             ></textarea>
           </div>
 
           <div class="action-row">
-            <button id="updateBtn">تحديث الحالة</button>
+            <!-- Injected translation support -->
+            <button
+              id="updateBtn"
+              data-ar="تحديث الحالة"
+              data-en="Update Status"
+            >
+              تحديث الحالة
+            </button>
           </div>
         </section>
         <div id="toastContainer" class="toast-container"></div>
@@ -102,5 +147,7 @@
 
     <script type="module" src="../statics/js/loadSidebar.js"></script>
     <script type="module" src="../statics/js/update.js"></script>
+    <!-- Injected settings integration for dark mode and translations -->
+    <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

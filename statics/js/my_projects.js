@@ -3,31 +3,89 @@ import { db, auth } from "./firebase.js";
 import { collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+/* -------------------------------------------
+   Translation helpers (extracted from source)
+   ------------------------------------------- */
+function getLang() {
+  return localStorage.getItem("language") || "ar";
+}
+
+// Returns Arabic or English text based on stored language
+function translateText(ar, en) {
+  return getLang() === "en" ? en : ar;
+}
+
+// Simple isEnglish helper
+const isEnglish = () => getLang() === "en";
+
+// Translates dynamic values (optional, placeholder for future use)
+function translateDynamicValue(value) {
+  if (!isEnglish()) return value;
+  const map = {};
+  return map[value] || value;
+}
+
+/* -------------------------------------------
+   Dark mode support (extracted from source)
+   ------------------------------------------- */
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "light";
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+}
+
+// Apply theme on load
+applyTheme();
+
 /* =================================================== CONSTANTS =================================================== */
 const itemsPerPage = 8;
 
-const statusTranslation = {
-  completed: "مكتمل",
-  in_progress: "قيد التنفيذ"
-};
+function translateSeverity(val) {
+  const key = String(val || "").toLowerCase();
+  const map = {
+    high: { ar: "عالية", en: "High" },
+    red: { ar: "عالية", en: "High" },
+    medium: { ar: "متوسطة", en: "Medium" },
+    orange: { ar: "متوسطة", en: "Medium" },
+    low: { ar: "منخفضة", en: "Low" },
+    yellow: { ar: "منخفضة", en: "Low" }
+  };
+  return map[key]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
 
-const severityTranslation = {
-  high: "عالية",
-  Red: "عالية",
-  red: "عالية",
-  medium: "متوسطة",
-  Orange: "متوسطة",
-  orange: "متوسطة",
-  low: "منخفضة",
-  Yellow: "منخفضة"
-};
+function translateStatus(val) {
+  const map = {
+    completed: { ar: "مكتمل", en: "Completed" },
+    in_progress: { ar: "قيد التنفيذ", en: "In Progress" },
+    pending: { ar: "غير مكتمل", en: "Pending" }
+  };
+  return map[val]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
 
-const damageTypeTranslation = {
-  pothole: "حفرة",
-  crack: "تشقق",
-  water: "تجمع مياه",
-  normal: "سليم"
-};
+function translateDamageType(val) {
+  const key = normalizeDamageType(val);
+  const map = {
+    pothole: { ar: "حفرة", en: "Pothole" },
+    crack: { ar: "تشقق", en: "Crack" },
+    water: { ar: "تجمع مياه", en: "Water Pooling" },
+    normal: { ar: "سليم", en: "Normal" }
+  };
+  return map[key]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
+
+function translatePrediction(val) {
+  const map = {
+    "مستقر": { ar: "مستقر", en: "Stable" },
+    "مستقر أو يتدهور ببطء": { ar: "مستقر أو يتدهور ببطء", en: "Slow Deterioration" },
+    "قد يتفاقم": { ar: "قد يتفاقم", en: "Potential Deterioration" },
+    "سيتفاقم بمرور الوقت": { ar: "سيتفاقم بمرور الوقت", en: "Ongoing Deterioration" },
+    "سيتفاقم بسرعة": { ar: "سيتفاقم بسرعة", en: "Rapid Deterioration" }
+  };
+  return map[val]?.[isEnglish() ? "en" : "ar"] || val || "-";
+}
 
 /* =================================================== STATE/VARIABLES =================================================== */
 let usersMap = {};
@@ -61,11 +119,21 @@ const formatDate = (date) => {
 // دالة توحيد مسميات الأضرار لضمان عمل الفلتر بدقة
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
-  if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
-  if (["crack", "cracks", "تشقق", "شقوق"].includes(damage)) return "crack";
-  if (["water", "water_pool", "water accumulation", "تجمع مياه"].includes(damage)) return "water";
+
+  if (["pothole", "hole", "حفرة", "حفره"].includes(damage)) return "pothole";
+  if (["crack", "cracks", "تشقق", "شقوق", "تشققات"].includes(damage)) return "crack";
+  if (["water", "water_pool", "water accumulation", "تجمع مياه", "مياه"].includes(damage)) return "water";
   if (["normal", "safe", "سليم", "طبيعي"].includes(damage)) return "normal";
+
   return damage;
+}
+
+function getReportDamageType(report) {
+  return normalizeDamageType(
+    report.damage_type ||
+    report.damageType ||
+    report.damage
+  );
 }
 
 /* =================================================== MAIN LOGIC =================================================== */
@@ -104,7 +172,7 @@ const renderTablePaginated = () => {
           </button>
         </td>
         <td class="focus-col">#${report.id.substring(0, 5)}</td>
-        <td>${statusTranslation[report.status] || "-"}</td>
+        <td>${translateStatus(report.status)}</td>
         <td>${report.street_name || "غير محدد"}</td>
         <td>${formatDate(createdDate)}</td>
         <td>${formatDate(assignedDate)}</td>
@@ -113,7 +181,7 @@ const renderTablePaginated = () => {
     `);
   });
 
-  pageInfo.innerText = `صفحة ${currentPage} من ${totalPages}`;
+  pageInfo.innerText = translateText(`صفحة ${currentPage} من ${totalPages}`, `Page ${currentPage} of ${totalPages}`);
   prevPageBtn.disabled = currentPage === 1;
   nextPageBtn.disabled = currentPage === totalPages;
 };
@@ -209,22 +277,22 @@ const renderDetails = (report) => {
   reportDetailsCard.classList.remove("hidden");
 
   // عرض كرت التفاصيل مع ترجمة الخطورة ونوع الضرر الموحدة
-  reportDetailsCard.innerHTML = `
-    <div class="details-info">
-      <div class="details-info-header">
-        <h3>رقم البلاغ: #${report.id.substring(0, 5)}...</h3>
+    reportDetailsCard.innerHTML = `
+      <div class="details-info">
+        <div class="details-info-header">
+          <h3>${translateText('رقم البلاغ', 'Report ID')}: #${report.id.substring(0, 5)}...</h3>
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>${translateText('الموقع', 'Location')}: ${report.street_name || translateText('غير محدد', 'Not specified')}</span></div>
+          <div class="info-item"><i class="fa-solid fa-user"></i> <span>${translateText('الموظف', 'Employee')}: ${usersMap[report.created_by] || "-"}</span></div>
+          <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>${translateText('المهندس', 'Engineer')}: ${usersMap[report.assigned_to] || "-"}</span></div>
+          <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>${translateText('الضرر', 'Damage')}: ${translateDamageType(report.damage_type || report.prediction)}</span></div>
+          <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>${translateText('الخطورة', 'Severity')}: ${translateSeverity(report.severity)}</span></div>
+          <div class="info-item"><i class="fa-solid fa-brain"></i> <span>${translateText('التنبؤ', 'Prediction')}: ${translatePrediction(report.prediction || report.prediction_note || "-")}</span></div>
+        </div>
       </div>
-      <div class="info-grid">
-        <div class="info-item"><i class="fa-solid fa-location-dot"></i> <span>الموقع: ${report.street_name || "غير محدد"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-user"></i> <span>الموظف: ${usersMap[report.created_by] || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-helmet-safety"></i> <span>المهندس: ${usersMap[report.assigned_to] || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-wrench"></i> <span>الضرر: ${damageTypeTranslation[normalizeDamageType(report.damage_type || report.prediction)] || report.damage_type || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>الخطورة: ${severityTranslation[report.severity] || "-"}</span></div>
-        <div class="info-item"><i class="fa-solid fa-brain"></i> <span>التنبؤ: ${report.prediction || report.prediction_note || "-"}</span></div>
-      </div>
-    </div>
-    ${imageHTML}
-  `;
+      ${imageHTML}
+    `;
 };
 
 /* =================================================== EVENT LISTENERS =================================================== */
