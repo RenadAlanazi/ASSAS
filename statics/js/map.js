@@ -32,7 +32,7 @@ function initMap() {
     document.getElementById("latitude").value = lat;
     document.getElementById("longitude").value = lng;
 
-    // ✅ Get clean address parts
+    
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results[0]) {
         const components = results[0].address_components;
@@ -86,7 +86,23 @@ function initMap() {
   });
 }
 
+
 window.initMap = initMap;
+
+
+function loadGoogleMaps() {
+  if (!document.querySelector('script[src*="maps.googleapis.com"]')) {
+    const script = document.createElement("script");
+    script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyB-uPN8afr4qXu5JE1Iew0wR5WfK3YscwY&callback=initMap";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+}
+
+
+loadGoogleMaps();
+
 
 export function getSelectedLocation() {
   return selectedLocation;
