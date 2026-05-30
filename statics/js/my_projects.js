@@ -1,33 +1,26 @@
-/* =================================================== IMPORTS =================================================== */
+/* ================= Imports ================= */
 import { db, auth } from "./firebase.js";
 import { collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-/* -------------------------------------------
-   Translation helpers (extracted from source)
-   ------------------------------------------- */
+/* ================= Language Helpers ================= */
 function getLang() {
   return localStorage.getItem("language") || "ar";
 }
 
-// Returns Arabic or English text based on stored language
 function translateText(ar, en) {
   return getLang() === "en" ? en : ar;
 }
 
-// Simple isEnglish helper
 const isEnglish = () => getLang() === "en";
 
-// Translates dynamic values (optional, placeholder for future use)
 function translateDynamicValue(value) {
   if (!isEnglish()) return value;
   const map = {};
   return map[value] || value;
 }
 
-/* -------------------------------------------
-   Dark mode support (extracted from source)
-   ------------------------------------------- */
+/* ================= Theme Helpers ================= */
 function applyTheme() {
   const theme = localStorage.getItem("theme") || "light";
   if (theme === "dark") {
@@ -37,10 +30,9 @@ function applyTheme() {
   }
 }
 
-// Apply theme on load
 applyTheme();
 
-/* =================================================== CONSTANTS =================================================== */
+/* ================= Constants ================= */
 const itemsPerPage = 8;
 
 function translateSeverity(val) {
@@ -87,7 +79,7 @@ function translatePrediction(val) {
   return map[val]?.[isEnglish() ? "en" : "ar"] || val || "-";
 }
 
-/* =================================================== STATE/VARIABLES =================================================== */
+/* ================= State ================= */
 let usersMap = {};
 let allReports = [];
 let filteredReports = [];
@@ -107,7 +99,7 @@ const nextPageBtn = document.getElementById("nextPageBtn");
 const pageInfo = document.getElementById("pageInfo");
 const reportDetailsCard = document.getElementById("reportDetailsCard");
 
-/* =================================================== HELPERS/UTILS =================================================== */
+/* ================= Helpers ================= */
 const formatDate = (date) => {
   if (!date) return "-";
   const year = date.getFullYear();
@@ -116,7 +108,6 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// دالة توحيد مسميات الأضرار لضمان عمل الفلتر بدقة
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
 
@@ -136,7 +127,7 @@ function getReportDamageType(report) {
   );
 }
 
-/* =================================================== MAIN LOGIC =================================================== */
+/* ================= My Projects Rendering ================= */
 const renderTablePaginated = () => {
   tableBody.innerHTML = "";
   const totalItems = filteredReports.length;
@@ -207,7 +198,6 @@ const applyFiltersAndSearch = () => {
       if (!report.id.includes(searchVal) && !street.includes(searchVal)) match = false;
     }
 
-    // تعديل فلتر الخطورة ليتعرف على الألوان (Red, Yellow...)
     if (severityVal) {
       const reportSev = String(report.severity || "").toLowerCase();
       const filterSev = severityVal.toLowerCase();
@@ -227,7 +217,6 @@ const applyFiltersAndSearch = () => {
     if (statusVal && report.status !== statusVal) match = false;
     if (locationVal && (!report.street_name || !report.street_name.includes(locationVal))) match = false;
 
-    // تعديل فلتر النوع ليتعرف على المسميات العربية والإنجليزية
     if (damageTypeVal) {
       const reportType = normalizeDamageType(report.damage_type || report.prediction || "");
       const selectedType = normalizeDamageType(damageTypeVal);
@@ -276,7 +265,6 @@ const renderDetails = (report) => {
   reportDetailsCard.className = `report-details ${report.status}`;
   reportDetailsCard.classList.remove("hidden");
 
-  // عرض كرت التفاصيل مع ترجمة الخطورة ونوع الضرر الموحدة
     reportDetailsCard.innerHTML = `
       <div class="details-info">
         <div class="details-info-header">
@@ -295,7 +283,7 @@ const renderDetails = (report) => {
     `;
 };
 
-/* =================================================== EVENT LISTENERS =================================================== */
+/* ================= Event Listeners ================= */
 [
   searchInput,
   filterSeverity,
@@ -343,7 +331,7 @@ tableBody.addEventListener("click", (e) => {
   renderDetails(report);
 });
 
-/* =================================================== INITIALIZATION =================================================== */
+/* ================= Initialization ================= */
 onSnapshot(collection(db, "users"), (snapshot) => {
   usersMap = {};
   snapshot.docs.forEach(docSnap => {

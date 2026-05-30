@@ -8,7 +8,7 @@
     <link
       rel="icon"
       type="image/png"
-      href="../statics/img/Assas_clear_logo_2.png"
+      href="../statics/img/Assas_clear_logo.png"
     />
 
     <!-- Font Awesome -->
@@ -23,9 +23,9 @@
       rel="stylesheet"
     />
 
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/index.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
   <body class="home-page">
@@ -40,7 +40,7 @@
       </div>
 
       <div class="left">
-        <!-- Injected translation support and language toggle integration -->
+        <!-- Language switcher -->
         <span class="lang language-toggle">
           <span class="lang-text" data-ar="English" data-en="العربية">
             English
@@ -58,7 +58,6 @@
 
     <!-- Main Section -->
     <section class="hero">
-      <!-- Injected translation support -->
       <h1 data-ar="أهلاً بك في عسّاس" data-en="Welcome to Assas">
         أهلاً بك في عسّاس
       </h1>
@@ -74,7 +73,7 @@
         <!-- موظف عساس -->
         <div class="card employee">
           <div class="card-content">
-            <!-- Injected translation support -->
+            <!-- Employee portal card -->
             <h3 data-ar="موظف عسّاس" data-en="Assas Admin">موظف عسّاس</h3>
             <p
               data-ar="الصلاحيات الإدارية والتحليل"
@@ -97,7 +96,7 @@
         <!-- مهندس عساس -->
         <div class="card engineer">
           <div class="card-content">
-            <!-- Injected translation support -->
+            <!-- Engineer portal card -->
             <h3 data-ar="مهندس عسّاس" data-en="Assas Engineer">مهندس عسّاس</h3>
             <p
               data-ar="لاستلام المهام الميدانية"
@@ -119,7 +118,7 @@
       </div>
     </section>
 
-    <!-- Injected settings integration for dark mode and translations -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
 
     <script>
@@ -128,7 +127,6 @@
         if (urlParams.get("logout") === "success") {
           alert("تم تسجيل الخروج بنجاح. شكراً لاستخدامك النظام!");
 
-          // تنظيف الرابط ليبقى احترافياً (بدون ?logout=success)
           window.history.replaceState(
             {},
             document.title,

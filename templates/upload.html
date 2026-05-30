@@ -24,9 +24,9 @@
       rel="stylesheet"
     />
 
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/upload.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
 
     <!-- bootstrap -->
@@ -49,7 +49,7 @@
         <div class="content-grid">
           <!-- Inputs -->
           <div class="form-box">
-            <!-- Injected translated placeholders -->
+            <!-- Street input -->
             <input
               type="text"
               id="streetName"
@@ -59,7 +59,7 @@
               data-placeholder-en="Street Name"
             />
 
-            <!-- Injected translated placeholders -->
+            <!-- Latitude input -->
             <input
               type="number"
               id="latitude"
@@ -69,7 +69,7 @@
               data-placeholder-en="Latitude"
             />
 
-            <!-- Injected translated placeholders -->
+            <!-- Longitude input -->
             <input
               type="number"
               id="longitude"
@@ -79,7 +79,7 @@
               data-placeholder-en="Longitude"
             />
 
-            <!-- Injected translation support -->
+            <!-- Submit action -->
             <button
               id="submitBtn"
               class="btn btn-success mt-3"
@@ -100,7 +100,7 @@
                       d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
                     ></path>
                   </svg>
-                  <!-- Injected translation support -->
+                  <!-- File upload instruction -->
                   <p
                     id="fileNameDisplay"
                     data-ar="اسحب الملف هنا"
@@ -108,9 +108,9 @@
                   >
                     اسحب الملف هنا
                   </p>
-                  <!-- Injected translation support -->
+                  <!-- File selection state -->
                   <p data-ar="أو" data-en="or">أو</p>
-                  <!-- Injected translation support -->
+                  <!-- Upload requirement note -->
                   <span
                     class="browse-button"
                     data-ar="اختر ملف"
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Google Maps API must be loaded after map.js is defined -->
-    <<script type="module" src="../statics/js/map.js"></script>
+    <script type="module" src="../statics/js/map.js"></script>
     <script type="module" src="../statics/js/upload.js"></script>
 
     <script
@@ -140,6 +140,5 @@
     ></script>
     <script type="module" src="../statics/js/loadSidebar.js"></script>
     <script type="module" src="../statics/js/settings.js"></script>
-  
   </body>
 </html>

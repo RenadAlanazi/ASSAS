@@ -1,4 +1,4 @@
-/* CONSTANTS */
+/* Design tokens used by the dashboard interface. */
 :root {
   --green: #0b5f47;
   --green-dark: #084936;
@@ -12,7 +12,7 @@
   --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.14);
 }
 
-/* STATE/VARIABLES */
+/* Shared visual states and status indicators. */
 .hidden {
   display: none;
 }
@@ -80,7 +80,7 @@ aside ul li.active {
   --toast-text: #5b21b6;
 }
 
-/* HELPERS/UTILS */
+/* Reusable dashboard components. */
 .status-dot {
   width: 14px;
   height: 14px;
@@ -172,7 +172,7 @@ aside ul li.active {
   line-height: 1.6;
 }
 
-/* MAIN LOGIC */
+/* Main dashboard layout. */
 body {
   margin: 0;
   font-family: "Cairo", sans-serif;
@@ -514,7 +514,7 @@ td {
   transform: rotateY(180deg);
 }
 
-/* EVENT LISTENERS */
+/* Interactive controls and table states. */
 aside ul li:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(-2px);
@@ -556,7 +556,7 @@ aside ul li:hover {
   background-color: #e8f7ed !important;
 }
 
-/* INITIALIZATION */
+/* Notification panel layout. */
 @keyframes fadeIn {
   from {
     transform: translateY(10px);

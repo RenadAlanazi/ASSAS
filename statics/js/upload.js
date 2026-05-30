@@ -1,9 +1,9 @@
-// upload.js
-import { auth } from "./firebase.js"; // تأكدي أن المسار صحيح
+/* ================= Imports ================= */
+import { auth } from "./firebase.js";
 import { getSelectedLocation } from "./map.js";
 import { addActivity, showToast } from "./utils.js";
 
-// DOM elements
+/* ================= DOM References ================= */
 const fileInput = document.getElementById("fileInput");
 const uploadLabel = document.querySelector(".file-upload-label");
 const submitBtn = document.getElementById("submitBtn");
@@ -11,22 +11,22 @@ const streetInput = document.getElementById("streetName");
 const latInput = document.getElementById("latitude");
 const lngInput = document.getElementById("longitude");
 
-// Translation helpers // Translation improvement added
-const isEnglish = () => localStorage.getItem("language") === "en"; // Translation improvement added
-const t = (ar, en) => isEnglish() ? en : ar; // Translation improvement added
+/* ================= Language Helpers ================= */
+const isEnglish = () => localStorage.getItem("language") === "en";
+const t = (ar, en) => isEnglish() ? en : ar;
 
-// ------------------- Auth Check -------------------
+/* ================= Authentication State ================= */
 auth.onAuthStateChanged((user) => {
   if (!user) {
-    alert(t("❌ يجب تسجيل الدخول للرفع", "❌ You must login to upload")); // Translation improvement added
+    alert(t("❌ يجب تسجيل الدخول للرفع", "❌ You must login to upload"));
     submitBtn.disabled = true;
   } else {
     submitBtn.disabled = false;
   }
 });
 
-// ------------------- UI Helpers -------------------
-function updateFileName(name, isSelected = true) { // Translation improvement added
+/* ================= UI Helpers ================= */
+function updateFileName(name, isSelected = true) {
   const p = document.getElementById("fileNameDisplay");
   if (!p) return;
 
@@ -35,19 +35,20 @@ function updateFileName(name, isSelected = true) { // Translation improvement ad
     : name;
 }
 
+/* ================= File Selection ================= */
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length) {
     const file = fileInput.files[0];
     if (file.type.startsWith("image/")) {
       updateFileName(file.name);
     } else {
-      alert(t("❌ عذراً، يُسمح برفع الصور فقط", "❌ Please upload an image file only")); // Translation improvement added
+      alert(t("❌ عذراً، يُسمح برفع الصور فقط", "❌ Please upload an image file only"));
       fileInput.value = "";
     }
   }
 });
 
-// ------------------- Drag & Drop -------------------
+/* ================= Drag and Drop ================= */
 uploadLabel.addEventListener("dragover", (e) => {
   e.preventDefault();
   uploadLabel.classList.add("dragging");
@@ -66,16 +67,14 @@ uploadLabel.addEventListener("drop", (e) => {
 
   const file = files[0];
 
-  // Allow only images
   if (!file.type.startsWith("image/")) {
     showToast(
-      t("❌ يُسمح برفع الصور فقط", "❌ Please upload an image file only"), // Translation improvement added
+      t("❌ يُسمح برفع الصور فقط", "❌ Please upload an image file only"),
       "error"
     );
     return;
   }
 
-  // Put dropped file into input
   const dataTransfer = new DataTransfer();
   dataTransfer.items.add(file);
   fileInput.files = dataTransfer.files;
@@ -83,12 +82,12 @@ uploadLabel.addEventListener("drop", (e) => {
   updateFileName(file.name);
 
   showToast(
-    t("تم اختيار الصورة بنجاح", "Photo selected successfully"), // Translation improvement added
+    t("تم اختيار الصورة بنجاح", "Photo selected successfully"),
     "success"
   );
 });
 
-// ------------------- Submit Handler -------------------
+/* ================= Report Submission ================= */
 submitBtn.addEventListener("click", async () => {
   const file = fileInput.files[0];
   const mapLocation = getSelectedLocation();
@@ -103,10 +102,9 @@ submitBtn.addEventListener("click", async () => {
 
   const user = auth.currentUser;
 
-  // 1. Validation
   if (!user) {
     showToast(
-      t("يجب تسجيل الدخول", "Please log in first"), // Translation improvement added
+      t("يجب تسجيل الدخول", "Please log in first"),
       "error"
     );
     return;
@@ -114,7 +112,7 @@ submitBtn.addEventListener("click", async () => {
 
   if (!file) {
     showToast(
-      t("اختر صورة أولاً", "Please select a photo first"), // Translation improvement added
+      t("اختر صورة أولاً", "Please select a photo first"),
       "error"
     );
     return;
@@ -132,7 +130,7 @@ submitBtn.addEventListener("click", async () => {
 
   if (latitude == null || longitude == null) {
     showToast(
-      t("اختر الموقع أو أدخل الإحداثيات", "Select location or enter coordinates"), // Translation improvement added
+      t("اختر الموقع أو أدخل الإحداثيات", "Select location or enter coordinates"),
       "error"
     );
     return;
@@ -140,9 +138,8 @@ submitBtn.addEventListener("click", async () => {
 
   try {
     submitBtn.disabled = true;
-    submitBtn.textContent = t("⏳ جاري التحليل والرفع...", "⏳ Uploading..."); // Translation improvement added
+    submitBtn.textContent = t("⏳ جاري التحليل والرفع...", "⏳ Uploading...");
 
-    // Prepare Form Data
     const formData = new FormData();
     formData.append("image", file);
     formData.append("latitude", latitude);
@@ -150,7 +147,6 @@ submitBtn.addEventListener("click", async () => {
     formData.append("street_name", fullAddress);
     formData.append("created_by", user.uid);
 
-    // API Call
     const response = await fetch(
       "https://assas-backend-o9r8.onrender.com/upload-image",
       {
@@ -167,38 +163,37 @@ submitBtn.addEventListener("click", async () => {
 
     if (result.success) {
       await addActivity(
-        t("تم رفع بلاغ جديد", "A new report has been uploaded"), // Translation improvement added
+        t("تم رفع بلاغ جديد", "A new report has been uploaded"),
         "upload",
         { reportId: result.reportId || result.id || null }
       );
 
       showToast(
-        t("تم تحليل الصورة وحفظ البلاغ بنجاح", "Report analyzed and saved successfully!"), // Translation improvement added
+        t("تم تحليل الصورة وحفظ البلاغ بنجاح", "Report analyzed and saved successfully!"),
         "upload"
       );
 
       console.log("AI Result:", result.analysis);
 
-      // Reset form
       fileInput.value = "";
       streetInput.value = "";
       latInput.value = "";
       lngInput.value = "";
-      updateFileName(t("اسحب الملف هنا", "Drag a photo here"), false); // Translation improvement added
+      updateFileName(t("اسحب الملف هنا", "Drag a photo here"), false);
     } else {
       showToast(
-        t("خطأ من السيرفر: ", "Server error: ") + (result.error || ""), // Translation improvement added
+        t("خطأ من السيرفر: ", "Server error: ") + (result.error || ""),
         "error"
       );
     }
   } catch (error) {
     console.error("Upload Error:", error);
     showToast(
-      t("فشل الاتصال بسيرفر الذكاء الاصطناعي", "Failed to connect to the AI server"), // Translation improvement added
+      t("فشل الاتصال بسيرفر الذكاء الاصطناعي", "Failed to connect to the AI server"),
       "error"
     );
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = t("إرسال البلاغ", "Submit Report"); // Translation improvement added
+    submitBtn.textContent = t("إرسال البلاغ", "Submit Report");
   }
 });

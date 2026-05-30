@@ -23,7 +23,7 @@
     />
 
     <link rel="stylesheet" href="../statics/css/update.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
 
@@ -36,7 +36,7 @@
         <section class="update-card">
           <div class="top-row">
             <h2 id="reportId" class="report-id">#---</h2>
-            <!-- Injected translation support -->
+            <!-- Report status heading -->
             <span
               id="statusBadge"
               class="status-badge"
@@ -57,10 +57,10 @@
 
           <div class="content-grid">
             <div class="report-side">
-              <!-- Injected translation support -->
+              <!-- Original report image -->
               <h3 data-ar="الصورة المتضررة" data-en="Damage Photo">الصورة المتضررة</h3>
               <div id="reportImageContainer" class="report-image-box">
-                <!-- Injected translation support -->
+                <!-- Image placeholder -->
                 <span
                   class="placeholder-text"
                   data-ar="جاري تحميل الصورة..."
@@ -72,11 +72,11 @@
             </div>
 
             <div class="upload-side">
-              <!-- Injected translation support -->
+              <!-- Repair image upload -->
               <h3 data-ar="الصورة بعد الإصلاح" data-en="Repair Photo">الصورة بعد الإصلاح</h3>
 
               <div class="small-upload-row">
-                <!-- Injected translation support -->
+                <!-- Upload button text -->
                 <label
                   for="completionImage"
                   class="small-upload-btn"
@@ -87,7 +87,7 @@
                   اختر صورة
                 </label>
                 <input id="completionImage" type="file" accept="image/*" />
-                <!-- Injected translation support -->
+                <!-- File selection label -->
                 <span
                   id="fileNameDisplay"
                   class="file-name"
@@ -101,27 +101,27 @@
           </div>
 
           <div class="status-section">
-            <!-- Injected translation support -->
+            <!-- Status update panel -->
             <h3 data-ar="الحالة" data-en="Status">الحالة</h3>
             <div class="radio-group">
               <label class="radio-option">
                 <input type="radio" name="status" value="completed" />
-                <!-- Injected translation support -->
+                <!-- Pending status option -->
                 <span data-ar="مكتمل" data-en="Completed">مكتمل</span>
               </label>
 
               <label class="radio-option">
                 <input type="radio" name="status" value="pending" />
-                <!-- Injected translation support -->
+                <!-- In-progress status option -->
                 <span data-ar="تنازل" data-en="Dismissed">تنازل</span>
               </label>
             </div>
           </div>
 
           <div class="notes-section">
-            <!-- Injected translation support -->
+            <!-- Notes label -->
             <label for="notes" data-ar="ملاحظات" data-en="Notes">ملاحظات</label>
-            <!-- Injected translated placeholders -->
+            <!-- Notes input -->
             <textarea
               id="notes"
               placeholder="اكتب ملاحظات المهندس هنا..."
@@ -131,7 +131,7 @@
           </div>
 
           <div class="action-row">
-            <!-- Injected translation support -->
+            <!-- Update action -->
             <button
               id="updateBtn"
               data-ar="تحديث الحالة"
@@ -147,7 +147,7 @@
 
     <script type="module" src="../statics/js/loadSidebar.js"></script>
     <script type="module" src="../statics/js/update.js"></script>
-    <!-- Injected settings integration for dark mode and translations -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

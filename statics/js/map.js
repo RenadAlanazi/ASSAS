@@ -1,11 +1,10 @@
-// map.js
-
+/* ================= Map State ================= */
 let selectedLocation = null;
 let map;
 let marker;
 let geocoder;
 
-// ✅ Initialize the map
+/* ================= Map Initialization ================= */
 function initMap() {
   const defaultCenter = { lat: 24.7136, lng: 46.6753 }; // Riyadh
 
@@ -20,7 +19,6 @@ function initMap() {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
 
-    // Move marker
     if (marker) marker.setMap(null);
 
     marker = new google.maps.Marker({
@@ -28,7 +26,6 @@ function initMap() {
       map: map,
     });
 
-    // Fill inputs
     document.getElementById("latitude").value = lat;
     document.getElementById("longitude").value = lng;
 
@@ -56,7 +53,6 @@ function initMap() {
           }
         });
 
-        // fallback for city
         if (!city) {
           const admin = components.find((c) =>
             c.types.includes("administrative_area_level_1")
@@ -64,7 +60,6 @@ function initMap() {
           city = admin?.long_name || "";
         }
 
-        // ✅ Save structured location
         selectedLocation = {
           lat,
           lng,
@@ -73,7 +68,6 @@ function initMap() {
           city,
         };
 
-        // ✅ Show clean value in input
         const clean = [street, neighborhood, city]
           .filter(Boolean)
           .join("، ");
@@ -89,7 +83,7 @@ function initMap() {
 
 window.initMap = initMap;
 
-
+/* ================= Google Maps Loader ================= */
 function loadGoogleMaps() {
   if (!document.querySelector('script[src*="maps.googleapis.com"]')) {
     const script = document.createElement("script");
@@ -103,7 +97,7 @@ function loadGoogleMaps() {
 
 loadGoogleMaps();
 
-
+/* ================= Public Accessor ================= */
 export function getSelectedLocation() {
   return selectedLocation;
 }

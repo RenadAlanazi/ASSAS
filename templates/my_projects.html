@@ -23,9 +23,9 @@
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/my_projects.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
 
@@ -37,11 +37,11 @@
       <!-- Main Content -->
       <main>
         <div class="topbar">
-          <!-- Injected translation support -->
+          <!-- Page heading -->
           <h2 data-ar="مشاريعي" data-en="My Projects">مشاريعي</h2>
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <!-- Injected translated placeholders -->
+            <!-- Search input -->
             <input
               type="text"
               id="searchInput"
@@ -59,7 +59,7 @@
         <div class="filter-section">
           <div class="filter-group">
             <select id="filterStatus">
-              <!-- Injected translation support for options -->
+              <!-- Severity filter options -->
               <option
                 value=""
                 disabled
@@ -84,7 +84,7 @@
           </div>
           <div class="filter-group">
             <select id="filterSeverity">
-              <!-- Injected translation support for options -->
+              <!-- Status filter options -->
               <option
                 value=""
                 disabled
@@ -105,7 +105,7 @@
 
           <div class="filter-group">
             <select id="filterDamageType">
-              <!-- Injected translation support for options -->
+              <!-- Damage type filter options -->
               <option
                 value=""
                 disabled
@@ -131,7 +131,7 @@
 
           <div class="filter-group">
             <select id="filterLocation">
-              <!-- Injected translation support for location filter -->
+              <!-- Location filter options -->
               <option
                 value=""
                 disabled
@@ -207,18 +207,18 @@
           </div>
 
           <div class="filter-group">
-            <!-- Injected translation support -->
+            <!-- Date range label -->
             <label data-ar="من" data-en="From">من</label>
             <input type="date" id="filterDateFrom" />
           </div>
           <div class="filter-group">
-            <!-- Injected translation support -->
+            <!-- Date range label -->
             <label data-ar="إلى" data-en="To">إلى</label>
             <input type="date" id="filterDateTo" />
           </div>
 
           <div class="filter-actions">
-            <!-- Injected translation support for reset button -->
+            <!-- Reset filters action -->
             <button class="filter-btn reset-btn" id="resetFiltersBtn">
               <i class="fa-solid fa-rotate-right"></i>
               <span data-ar="إعادة ضبط" data-en="Reset">إعادة ضبط</span>
@@ -230,7 +230,7 @@
         <table>
           <thead>
             <tr>
-              <!-- Injected translation support for table headers -->
+              <!-- Reports table headers -->
               <th data-ar="تحديث" data-en="Update">تحديث</th>
               <th data-ar="رقم البلاغ" data-en="Report ID">رقم البلاغ</th>
               <th data-ar="الحالة" data-en="Status">الحالة</th>
@@ -251,7 +251,7 @@
 
         <!-- Pagination -->
         <div class="pagination" id="paginationControls">
-          <!-- Injected translation support and icon handling -->
+          <!-- Pagination controls -->
           <button
             class="page-btn"
             id="prevPageBtn"
@@ -282,7 +282,7 @@
     <!-- Firebase + Dashboard Logic -->
     <script type="module" src="../statics/js/my_projects.js"></script>
     <script type="module" src="../statics/js/loadSidebar.js"></script>
-    <!-- Injected settings integration for dark mode and translations -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

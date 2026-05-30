@@ -1,10 +1,10 @@
-/* =================================================== IMPORTS =================================================== */
+/* ================= Imports ================= */
 import { db, auth } from "./firebase.js";
 import { collection, onSnapshot, updateDoc, doc, serverTimestamp, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { addActivity } from "./utils.js";
 
-/* =================================================== CONSTANTS =================================================== */
+/* ================= Constants ================= */
 const statusTranslation = {
   pending: "غير مكتمل",
 };
@@ -30,7 +30,7 @@ const translateText = (ar, en) => {
   return isEnglish() ? en : ar;
 };
 
-/* =================================================== STATE/VARIABLES =================================================== */
+/* ================= State ================= */
 let allReports = [];
 let filteredReports = [];
 let markersMap = {};
@@ -53,7 +53,7 @@ const resetFiltersBtn = document.getElementById("resetFiltersBtn");
 const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
 
-/* =================================================== HELPERS/UTILS =================================================== */
+/* ================= Helpers ================= */
 function parseFirestoreDate(field) {
   if (!field) return null;
   if (typeof field.toDate === "function") return field.toDate();
@@ -77,7 +77,6 @@ const getColor = (report) => {
   return "green";
 };
 
-// دالة توحيد مسميات الأضرار (لحل مشكلة الفلتر)
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
   if (["pothole", "hole", "حفرة"].includes(damage)) return "pothole";
@@ -135,7 +134,7 @@ const getPredictionText = (report) => {
   return val || "لا يوجد تحليل";
 };
 
-/* =================================================== NOTIFICATION HELPERS =================================================== */
+/* ================= Notification Helpers ================= */
 const notificationIcons = {
   complete: "fa-check",
   success: "fa-check",
@@ -149,7 +148,7 @@ const notificationIcons = {
 };
 
 const notificationTypes = new Set(Object.keys(notificationIcons));
-const readNotificationStorageKey = "assasReadNotificationIds_Eng"; // Using unique key for engineer dashboard
+const readNotificationStorageKey = "assasReadNotificationIds_Eng";
 const notificationLifetimeMs = 7 * 24 * 60 * 60 * 1000;
 let currentNotificationIds = [];
 
@@ -201,6 +200,13 @@ function getNotificationType(type) {
   return notificationTypes.has(type) ? type : "general";
 }
 
+function isEngineerNotificationForCurrentUser(data) {
+  const currentUserId = auth.currentUser?.uid;
+  if (!currentUserId) return false;
+
+  return data.targetUserId === currentUserId || data.actorUserId === currentUserId;
+}
+
 function formatTime(timestamp) {
   if (!timestamp) return "";
   const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
@@ -208,7 +214,7 @@ function formatTime(timestamp) {
   return isEnglish() ? date.toLocaleString("en-US") : date.toLocaleString("ar-SA");
 }
 
-/* =================================================== MAIN LOGIC =================================================== */
+/* ================= Dashboard Rendering ================= */
 class CustomPopup extends google.maps.OverlayView {
   constructor(position, content) {
     super();
@@ -424,13 +430,10 @@ function applyFiltersAndSearchCore() {
       const streetMatch = report.street_name?.toLowerCase().includes(searchVal);
       if (!idMatch && !streetMatch) matches = false;
     }
-    
-    // فلتر الخطورة
     if (severityVal) {
       if (normalizeSeverity(report.severity) !== severityVal.toLowerCase()) matches = false;
     }
-    
-    // فلتر نوع الضرر (تم تصحيحه هنا)
+
     if (damageVal) {
       const reportDamage = normalizeDamageType(report.damage_type || report.prediction || "");
       const selectedDamage = normalizeDamageType(damageVal);
@@ -566,14 +569,18 @@ window.assignReport = async function(id) {
       status: "in_progress",
     });
     const engineerName = usersMap[user.uid] || user.displayName || "المهندس";
-    await addActivity(`تم إسناد البلاغ #${id.substring(0, 5)} إلى المهندس ${engineerName}`, "assign", { reportId: id, targetUserId: user.uid });
+    await addActivity(`تم إسناد البلاغ #${id.substring(0, 5)} إلى المهندس ${engineerName}`, "assign", {
+      reportId: id,
+      targetUserId: user.uid,
+      actorUserId: user.uid,
+    });
     showToast("تم إسناد البلاغ لك بنجاح", "assign");
   } catch (err) {
     showToast("فشل في إسناد البلاغ", "error");
   }
 };
 
-/* =================================================== EVENT LISTENERS =================================================== */
+/* ================= Event Listeners ================= */
 function bindEvents() {
   const filterInputs = [searchInput, filterSeverity, filterDamageType, filterLocation, filterDateFrom, filterDateTo];
   filterInputs.forEach((el) => { if (el) el.addEventListener("input", applyFiltersAndSearch); });
@@ -605,7 +612,7 @@ function bindEvents() {
   });
 }
 
-/* =================================================== INITIALIZATION =================================================== */
+/* ================= Initialization ================= */
 function initDataListeners() {
   let isAuthReady = false;
   onAuthStateChanged(auth, (user) => {
@@ -653,14 +660,11 @@ function initNotifications() {
     snapshot.docs.forEach((docSnap) => {
       const data = docSnap.data();
       
-      // Cleanup expired notifications
       if (isExpiredNotification(data)) {
         deleteDoc(doc(db, "activity_logs", docSnap.id)).catch(() => {});
         return;
       }
-
-      // Filter for current engineer only
-      if (data.targetUserId && data.targetUserId !== auth.currentUser?.uid) {
+      if (!isEngineerNotificationForCurrentUser(data)) {
         return;
       }
       

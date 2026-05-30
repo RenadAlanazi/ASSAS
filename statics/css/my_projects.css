@@ -1,4 +1,4 @@
-/* CONSTANTS */
+/* Design tokens used by the assigned-projects view. */
 :root {
   --green: #0b5f47;
   --green-dark: #084936;
@@ -11,7 +11,7 @@
   --shadow-md: 0 14px 34px rgba(12, 87, 66, 0.1);
 }
 
-/* STATE/VARIABLES */
+/* Shared visual states and status indicators. */
 aside ul li.active {
   background: rgba(255, 255, 255, 0.25);
   font-weight: 600;
@@ -51,7 +51,7 @@ aside ul li.active {
   transform: rotateY(180deg);
 }
 
-/* HELPERS/UTILS */
+/* Reusable project components. */
 .status-dot {
   width: 12px;
   height: 12px;
@@ -64,7 +64,7 @@ aside ul li.active {
   font-weight: bold;
 }
 
-/* MAIN LOGIC */
+/* Main assigned-projects layout. */
 body {
   margin: 0;
   font-family: "Cairo", sans-serif;
@@ -416,7 +416,7 @@ td {
   transform: rotateY(180deg);
 }
 
-/* EVENT LISTENERS */
+/* Interactive controls and table states. */
 aside ul li:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(-2px);
@@ -458,4 +458,4 @@ aside ul li:hover {
   background-color: #e8f7ed !important;
 }
 
-/* INITIALIZATION */
+/* Responsive layout rules. */

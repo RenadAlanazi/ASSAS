@@ -23,9 +23,9 @@
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/projects.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
 
@@ -37,17 +37,17 @@
       <!-- Main Content -->
       <main>
         <div class="topbar">
-          <!-- Injected translation support -->
+          <!-- Page heading -->
           <h2 data-ar="المشاريع" data-en="Projects">المشاريع</h2>
           <div class="topbar-actions">
             <div class="filter-toggle">
-              <!-- Injected translation support -->
+              <!-- View toggle labels -->
               <button id="btnAll" class="toggle-btn active" data-ar="الكل" data-en="All">الكل</button>
               <button id="btnMine" class="toggle-btn" data-ar="بلاغاتي" data-en="My Reports">بلاغاتي</button>
             </div>
             <div class="search-box">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <!-- Injected translated placeholders -->
+              <!-- Search input -->
               <input
                 type="text"
                 id="searchInput"
@@ -66,7 +66,7 @@
         <div class="filter-section">
           <div class="filter-group">
             <select id="filterStatus">
-              <!-- Injected translation support for options -->
+              <!-- Severity filter options -->
               <option value="" disabled selected data-ar="الحالة" data-en="Status">الحالة</option>
               <option value="" data-ar="الكل" data-en="All">الكل</option>
               <option value="completed" data-ar="مكتمل" data-en="Completed">مكتمل</option>
@@ -76,7 +76,7 @@
           </div>
           <div class="filter-group">
             <select id="filterSeverity">
-              <!-- Injected translation support for options -->
+              <!-- Status filter options -->
               <option value="" disabled selected data-ar="الخطورة" data-en="Severity">الخطورة</option>
               <option value="" data-ar="الكل" data-en="All">الكل</option>
               <option value="high" data-ar="عالية" data-en="High">عالية</option>
@@ -87,7 +87,7 @@
 
           <div class="filter-group">
             <select id="filterDamageType">
-              <!-- Injected translation support for options -->
+              <!-- Damage type filter options -->
               <option value="" disabled selected data-ar="نوع الضرر" data-en="Damage Type">نوع الضرر</option>
               <option value="" data-ar="الكل" data-en="All">الكل</option>
               <option value="pothole" data-ar="حفرة" data-en="Pothole">حفرة</option>
@@ -99,7 +99,7 @@
 
           <div class="filter-group">
             <select id="filterLocation">
-              <!-- Injected translation support for location filter -->
+              <!-- Location filter options -->
               <option value="" disabled selected data-ar="الموقع" data-en="Location">الموقع</option>
               <option value="" data-ar="الكل" data-en="All">الكل</option>
               <option value="الرياض" data-ar="الرياض" data-en="Riyadh">الرياض</option>
@@ -127,18 +127,18 @@
           </div>
 
           <div class="filter-group">
-            <!-- Injected translation support -->
+            <!-- Date range label -->
             <label data-ar="من" data-en="From">من</label>
             <input type="date" id="filterDateFrom" />
           </div>
           <div class="filter-group">
-            <!-- Injected translation support -->
+            <!-- Date range label -->
             <label data-ar="إلى" data-en="To">إلى</label>
             <input type="date" id="filterDateTo" />
           </div>
 
           <div class="filter-actions">
-            <!-- Injected translation support for reset button -->
+            <!-- Reset filters action -->
             <button class="filter-btn reset-btn" id="resetFiltersBtn" data-ar="إعادة ضبط" data-en="Reset">
               <i class="fa-solid fa-rotate-right"></i> إعادة ضبط
             </button>
@@ -149,7 +149,7 @@
         <table>
           <thead>
             <tr>
-              <!-- Injected translation support for table headers -->
+              <!-- Reports table headers -->
               <th data-ar="حذف" data-en="Delete">حذف</th>
               <th data-ar="إجراءت" data-en="Actions">إجراءت</th>
               <th data-ar="رقم البلاغ" data-en="Report ID">رقم البلاغ</th>
@@ -165,7 +165,7 @@
 
         <!-- Pagination -->
         <div class="pagination" id="paginationControls">
-          <!-- Injected translation support and icon handling -->
+          <!-- Pagination controls -->
           <button
             class="page-btn"
             id="prevPageBtn"
@@ -201,12 +201,12 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
 
-        <!-- Injected translation support for modal -->
+        <!-- Confirmation modal content -->
         <h3 id="modalTitle" data-ar="حذف البلاغ؟" data-en="Delete report?">حذف البلاغ؟</h3>
         <p id="modalText" data-ar="سيتم حذف البلاغ نهائيًا ولا يمكن التراجع" data-en="This report will be permanently deleted and cannot be restored.">سيتم حذف البلاغ نهائيًا ولا يمكن التراجع</p>
 
         <div class="modal-actions">
-          <!-- Injected translation support for modal buttons -->
+          <!-- Confirmation modal actions -->
           <button id="cancelBtn" class="modal-btn cancel" data-ar="إلغاء" data-en="Cancel">إلغاء</button>
           <button id="confirmBtn" class="modal-btn confirm" data-ar="حذف" data-en="Delete">حذف</button>
         </div>
@@ -215,7 +215,7 @@
     <!-- Firebase + Dashboard Logic -->
     <script type="module" src="../statics/js/projects.js"></script>
     <script type="module" src="../statics/js/loadSidebar.js"></script>
-    <!-- Injected settings integration for dark mode and translations -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

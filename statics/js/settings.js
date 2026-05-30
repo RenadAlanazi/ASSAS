@@ -1,3 +1,4 @@
+/* ================= Theme Settings ================= */
 function applyDarkMode() {
   const savedTheme = localStorage.getItem("theme");
   const darkSwitch = document.getElementById("darkModeSwitch");
@@ -11,6 +12,7 @@ function applyDarkMode() {
   }
 }
 
+/* ================= Language Settings ================= */
 window.applyLanguage = function () {
   const lang = localStorage.getItem("language") || "ar";
 
@@ -31,53 +33,38 @@ window.applyLanguage = function () {
 
   document.querySelectorAll("[data-ar]").forEach((el) => {
     if (el.querySelector("i")) {
-      const text =
-        lang === "ar"
-          ? el.dataset.ar
-          : el.dataset.en;
-
+      const text = lang === "ar" ? el.dataset.ar : el.dataset.en;
       const icon = el.querySelector("i");
 
       el.innerHTML = `${icon.outerHTML} ${text}`;
-
     } else {
-      el.innerHTML =
-        lang === "ar"
-          ? el.dataset.ar
-          : el.dataset.en;
+      el.innerHTML = lang === "ar" ? el.dataset.ar : el.dataset.en;
     }
   });
 
   document.querySelectorAll("[data-placeholder-ar]").forEach((el) => {
-    el.placeholder =
-      lang === "ar"
-        ? el.dataset.placeholderAr
-        : el.dataset.placeholderEn;
+    el.placeholder = lang === "ar"
+      ? el.dataset.placeholderAr
+      : el.dataset.placeholderEn;
   });
 
   document.querySelectorAll("[data-icon-ar][data-icon-en]").forEach((el) => {
     const icon = el.querySelector("i");
 
     if (icon) {
-      icon.className =
-        lang === "ar"
-          ? el.dataset.iconAr
-          : el.dataset.iconEn;
+      icon.className = lang === "ar"
+        ? el.dataset.iconAr
+        : el.dataset.iconEn;
     }
   });
 };
 
+/* ================= User Actions ================= */
 window.toggleLanguage = function () {
-  const currentLang =
-    localStorage.getItem("language") || "ar";
+  const currentLang = localStorage.getItem("language") || "ar";
+  const newLang = currentLang === "ar" ? "en" : "ar";
 
-  const newLang =
-    currentLang === "ar" ? "en" : "ar";
-
-  localStorage.setItem(
-    "language",
-    newLang
-  );
+  localStorage.setItem("language", newLang);
 
   window.applyLanguage();
 
@@ -87,17 +74,14 @@ window.toggleLanguage = function () {
 };
 
 window.toggleDarkMode = function () {
-  const isDark =
-    document.body.classList.toggle("dark");
+  const isDark = document.body.classList.toggle("dark");
 
-  localStorage.setItem(
-    "theme",
-    isDark ? "dark" : "light"
-  );
+  localStorage.setItem("theme", isDark ? "dark" : "light");
 
   location.reload();
 };
 
+/* ================= Initialization ================= */
 document.addEventListener("DOMContentLoaded", () => {
   applyDarkMode();
   window.applyLanguage();

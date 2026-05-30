@@ -23,9 +23,9 @@
       rel="stylesheet"
     />
 
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/login.css" />
-    <!-- Injected dark theme support -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
   </head>
 
@@ -46,9 +46,11 @@
 
       <!-- Vision and Language (Top Left) -->
       <div class="left">
-        <!-- Injected translation support and language toggle integration -->
+        <!-- Language switcher -->
         <span class="lang language-toggle">
-          <span class="lang-text" data-ar="English" data-en="العربية">English</span>
+          <span class="lang-text" data-ar="English" data-en="العربية"
+            >English</span
+          >
           <i class="fa-solid fa-globe"></i>
         </span>
         <img
@@ -64,8 +66,10 @@
     <!-- Login Card -->
     <main class="login-card">
       <h2 class="login-title">
-        <!-- Injected translation support -->
-        <span data-ar="تسجيل الدخول للمهندس" data-en="Engineer Login">تسجيل الدخول للمهندس</span>
+        <!-- Login heading -->
+        <span data-ar="تسجيل الدخول للمهندس" data-en="Engineer Login"
+          >تسجيل الدخول للمهندس</span
+        >
         <a href="index.html" class="back-arrow" aria-label="رجوع">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
@@ -80,7 +84,7 @@
               <path d="M4 6l8 6 8-6"></path>
             </svg>
           </span>
-          <!-- Injected translated placeholders -->
+          <!-- Email input -->
           <input
             type="email"
             name="email"
@@ -99,7 +103,7 @@
               <rect x="5" y="10" width="14" height="10" rx="2"></rect>
             </svg>
           </span>
-          <!-- Injected translated placeholders -->
+          <!-- Password input -->
           <input
             type="password"
             name="password"
@@ -111,17 +115,29 @@
         </div>
 
         <div class="forgot">
-          <a href="forgot_password.html" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</a>
+          <a
+            href="forgot_password.html"
+            data-ar="نسيت كلمة المرور؟"
+            data-en="Forgot password?"
+            >نسيت كلمة المرور؟</a
+          >
         </div>
 
-        <!-- Injected translated button text -->
-        <button type="submit" class="login-btn" data-ar="تسجيل دخول" data-en="Login">تسجيل دخول</button>
+        <!-- Submit action -->
+        <button
+          type="submit"
+          class="login-btn"
+          data-ar="تسجيل دخول"
+          data-en="Login"
+        >
+          تسجيل دخول
+        </button>
       </form>
     </main>
 
     <script type="module" src="../statics/js/firebase.js"></script>
     <script type="module" src="../statics/js/login.js"></script>
-    <!-- Injected settings integration for dark mode and translations -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

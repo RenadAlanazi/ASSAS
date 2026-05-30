@@ -1,21 +1,18 @@
+/* ================= Imports ================= */
 import { auth } from "../js/firebase.js";
 import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-/* -------------------------------------------
-   Translation helpers (extracted from source)
-   ------------------------------------------- */
+/* ================= Language Helpers ================= */
 function getLang() {
   return localStorage.getItem("language") || "ar";
 }
 
-// Returns Arabic or English text based on stored language
 function translateText(ar, en) {
   return getLang() === "en" ? en : ar;
 }
 
-// Translates dynamic values (e.g., department names, statuses)
 function translateDynamicValue(value) {
   if (getLang() !== "en") return value;
 
@@ -32,9 +29,7 @@ function translateDynamicValue(value) {
   return map[value] || value;
 }
 
-/* -------------------------------------------
-   Dark mode support (extracted from source)
-   ------------------------------------------- */
+/* ================= Theme Helpers ================= */
 function applyTheme() {
   const theme = localStorage.getItem("theme") || "light";
   if (theme === "dark") {
@@ -44,17 +39,15 @@ function applyTheme() {
   }
 }
 
-// Apply theme on load
 applyTheme();
 
-/* 1. التحقق من المستخدم وجلب البيانات */
+/* ================= Profile Loading ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "../templates/login.html";
     return;
   }
 
-  // أ. تحميل فوري من الذاكرة المحلية (LocalStorage) لسرعة الاستجابة
   const cachedUser = localStorage.getItem('user');
   let localData = cachedUser ? JSON.parse(cachedUser) : null;
 
@@ -74,7 +67,6 @@ onAuthStateChanged(auth, async (user) => {
     if (response.ok) {
       const serverData = await response.json();
 
-      // ج. حماية الصورة: إذا السيرفر لم يرسل رابطاً بعد، نتمسك بما لدينا في الكاش
       if (
         !serverData.profile_image &&
         localData &&
@@ -83,10 +75,8 @@ onAuthStateChanged(auth, async (user) => {
         serverData.profile_image = localData.profile_image;
       }
 
-      // د. تحديث الذاكرة المحلية بالبيانات "المعربة والذكية" القادمة من الباكند الجديد
       localStorage.setItem("user", JSON.stringify(serverData));
 
-      // هـ. التحديث الذكي: المقارنة تمنع الومضة (Flickering) عند تحميل البيانات الحية
       if (JSON.stringify(serverData) !== JSON.stringify(localData)) {
         fillProfileData(serverData);
       }
@@ -96,7 +86,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* 2. دالة تعبئة البيانات (النسخة النهائية المستقرة) */
+/* ================= Profile Rendering ================= */
 function fillProfileData(data) {
   if (!data) return;
 
@@ -108,20 +98,18 @@ function fillProfileData(data) {
     }
   };
 
-  // --- منطق الرتبة (لضمان المزامنة بين حساب الموظف والمهندس) ---
+  /* Role data is normalized before rendering translated labels. */
   const rawRole = String(data.role || "").toLowerCase().trim();
   const isEmployee = rawRole === "employee";
 
   safeUpdateText("name", data.name);
   safeUpdateText("employee_id", data.employee_id);
 
-  // تحديث الرتبة العلوية (translation aware) // Translation improvement added
   safeUpdateText(
     "role",
     translateText(isEmployee ? "موظف" : "مهندس", isEmployee ? "Employee" : "Engineer")
   );
 
-  // تحديث تسمية الإحصائيات بناءً على الرتبة (مرفوعة للموظف / مستلمة للمهندس) // Translation improvement added
   const taskLabel = document.getElementById("task_label");
   if (taskLabel) {
     const expectedLabel = isEmployee
@@ -135,7 +123,6 @@ function fillProfileData(data) {
   safeUpdateText("phone", data.phone);
   safeUpdateText("email", data.email);
 
-  // البيانات التالية تأتي الآن "جاهزة ومعربة" من الباكند الجديد
   safeUpdateText(
     "department",
     translateDynamicValue(data.department || "إدارة البلاغات")
@@ -150,7 +137,7 @@ function fillProfileData(data) {
   );
   safeUpdateText("joined_date", data.joined_date);
 
-  // --- إدارة الصورة وحل مشكلة الحروف العربية (ثبات فوري) ---
+  /* The profile image is updated only when the resolved source changes. */
   const profileImg = document.getElementById("profile_img");
   const userName = data.name || "User";
   let targetSrc = "";
@@ -158,14 +145,12 @@ function fillProfileData(data) {
   if (data.profile_image && data.profile_image.startsWith("http")) {
     targetSrc = data.profile_image;
   } else {
-    // استخراج أول حرف يدوياً لضمان ظهوره عربياً فوراً وبدون تبديل من الإنجليزية
     const firstChar = userName.trim().charAt(0);
     targetSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       firstChar
     )}&background=145b44&color=fff&size=128&length=1`;
   }
 
-  // تحديث الصورة فقط إذا تغير الرابط فعلاً لمنع Shifting
   if (profileImg && profileImg.getAttribute("src") !== targetSrc) {
     profileImg.src = targetSrc;
   }
@@ -179,7 +164,7 @@ function fillProfileData(data) {
   );
 }
 
-/* 3. منطق رفع وحفظ الصورة الشخصية */
+/* ================= Profile Image Upload ================= */
 const imageInput = document.getElementById("imageInput");
 const profileImgMain = document.getElementById("profile_img");
 const saveBtn = document.getElementById("save_image_btn");

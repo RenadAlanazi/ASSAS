@@ -1,4 +1,4 @@
-/* =================================================== IMPORTS =================================================== */
+/* ================= Imports ================= */
 import { db } from "./firebase.js";
 import {
   collection,
@@ -10,15 +10,13 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-/* =================================================== CONSTANTS =================================================== */
+/* ================= Constants ================= */
 const itemsPerPage = 8;
-// Translation improvement added
 const statusTranslation = {
   completed: "مكتمل",
   in_progress: "قيد التنفيذ",
   pending: "غير مكتمل",
 };
-// Translation improvement added
 const severityTranslation = {
   high: "عالية",
   Red: "عالية",
@@ -28,7 +26,6 @@ const severityTranslation = {
   Yellow: "منخفضة",
   Green: "طبيعي",
 };
-// Translation improvement added
 const damageTypeTranslation = {
   pothole: "حفرة",
   crack: "تشقق",
@@ -43,10 +40,9 @@ const DAMAGE_TYPES = {
   normal: { ar: "سليم", en: "Normal" },
 };
 
-// Translation improvement added
 const isEnglish = () => localStorage.getItem("language") === "en";
 
-/* =================================================== STATE/VARIABLES =================================================== */
+/* ================= State ================= */
 let allReports = [];
 let filteredReports = [];
 let markersMap = {};
@@ -68,7 +64,7 @@ const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
 const pageInfo = document.getElementById("pageInfo");
 
-/* =================================================== HELPERS/UTILS =================================================== */
+/* ================= Helpers ================= */
 const getColor = (report) => {
   const sev = String(report.severity || "").toLowerCase();
   if (sev === "high" || sev === "red" || sev === "عالية") return "red";
@@ -147,7 +143,6 @@ function createChart(id, color) {
           display: function (ctx) {
             return ctx.dataIndex === 0;
           },
-          // Dark mode improvement added
           color: document.body.classList.contains("dark")
           ? "#fff"
           : "#000",
@@ -173,7 +168,6 @@ function createChart(id, color) {
           const text = Math.round(value) + "%";
           ctx.save();
           ctx.font = `bold ${chart.height / 4.5}px Cairo`;
-          // Dark mode improvement added
           ctx.fillStyle = document.body.classList.contains("dark")
             ? "#fff"
             : "#000";
@@ -226,7 +220,7 @@ class CustomPopup extends google.maps.OverlayView {
   }
 }
 
-/* =================================================== MAIN LOGIC =================================================== */
+/* ================= Dashboard Rendering ================= */
 window.focusMarker = function (id) {
   const item = markersMap[id];
   if (!item) return;
@@ -288,8 +282,6 @@ function renderAllReports() {
         },
       });
 
-      // Dark mode improvement added
-      // Translation improvement added
       const popupContent = `
 <div style="position:relative; width:min(90vw,320px); max-height:80vh; overflow-y:auto; padding:20px; font-family:Cairo; text-align:${isEnglish() ? "left" : "right"}; background:${document.body.classList.contains("dark") ? "#12211c" : "white"};
 color:${document.body.classList.contains("dark") ? "#f1f5f9" : "#000"};border-top:6px solid ${getColor(report)}; border-radius:14px; box-shadow:0 15px 35px rgba(0,0,0,0.25);">
@@ -344,7 +336,6 @@ function renderTablePaginated() {
     const color = getColor(report);
     const completedClass = report.status === "completed" ? "row-completed" : "";
 
-    // Translation improvement added
     tableBody.insertAdjacentHTML(
       "beforeend",
       `
@@ -400,7 +391,6 @@ function renderTablePaginated() {
     );
   });
 
-  // Translation improvement added
   pageInfo.innerText = isEnglish()
   ? `Page ${currentPage} of ${totalPages}`
   : `صفحة ${currentPage} من ${totalPages}`;
@@ -476,7 +466,7 @@ function applyFiltersAndSearch() {
   renderTablePaginated();
 }
 
-/* =================================================== EVENT LISTENERS =================================================== */
+/* ================= Event Listeners ================= */
 [
   searchInput,
   filterSeverity,
@@ -529,7 +519,7 @@ tableBody.addEventListener("click", (e) => {
   }
 });
 
-/* =================================================== INITIALIZATION =================================================== */
+/* ================= Initialization ================= */
 highChart = createChart("highChart", "#e74c3c");
 mediumChart = createChart("mediumChart", "#f39c12");
 lowChart = createChart("lowChart", "#f1c40f");
@@ -558,7 +548,6 @@ onSnapshot(collection(db, "reports"), (snapshot) => {
   let counts = { high: 0, medium: 0, low: 0, completed: 0 };
 
  allReports.forEach((report) => {
-    // نحول النص لحروف صغيرة عشان يتطابق مع الحالات
    const sev = normalizeSeverity(report.severity);
 
 if (sev === "high") {
@@ -723,7 +712,6 @@ onSnapshot(q, (snapshot) => {
     empty.className =
       "notification-empty";
 
-    // Translation improvement added
     empty.textContent = isEnglish()
       ? "No notifications currently"
       : "لا توجد إشعارات حالياً";
@@ -792,7 +780,6 @@ function formatTime(timestamp) {
 
   const date = timestamp.toDate();
 
-  // Translation improvement added
   return isEnglish()
     ? date.toLocaleString("en-US")
     : date.toLocaleString("ar-SA");

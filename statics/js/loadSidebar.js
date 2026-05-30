@@ -1,93 +1,81 @@
-// loadSidebar.js
+/* ================= Imports ================= */
 import { auth } from "../js/firebase.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+/* ================= Sidebar Rendering ================= */
 async function initializeSidebar() {
-    const container = document.getElementById('sidebar-container');
-    if (!container) return;
+  const container = document.getElementById("sidebar-container");
+  if (!container) return;
 
-    try {
-        // 1. جلب قالب السايد بار
-        const response = await fetch('sidebar.html');
-        container.innerHTML = await response.text();
+  try {
+    const response = await fetch("sidebar.html");
+    container.innerHTML = await response.text();
 
-        // 2. جلب بيانات المستخدم
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const role = userData ? userData.role : 'employee'; 
+    const userData = JSON.parse(localStorage.getItem("user"));
+    const role = userData ? userData.role : "employee";
 
-        const nav = document.getElementById('dynamic-nav');
-        
-        // 3. تعريف الروابط
-        // Translation improvement added: textEn added to menu items
-        const menuItems = {
-            employee: [
-                { text: 'لوحة التحكم', textEn: 'Dashboard', icon: 'fa-chart-line', href: 'emp_dashboard.html' },
-                { text: 'رفع بلاغ', textEn: 'Upload Report', icon: 'fa-camera', href: 'upload.html' }, 
-                { text: 'المشاريع', textEn: 'Projects', icon: 'fa-folder-open', href: 'projects.html' },
-                { text: 'الصفحة الشخصية', textEn: 'Profile', icon: 'fa-user', href: 'profile.html' }
-            ],
-            engineer: [
-                { text: 'لوحة التحكم', textEn: 'Dashboard', icon: 'fa-gauge-high', href: 'eng_dashboard.html' },
-                { text: 'مشاريعي', textEn: 'My Projects', icon: 'fa-list-check', href: 'my_projects.html' },
-                { text: 'تحديث البلاغ', textEn: 'Update Report', icon: 'fa-pen-to-square', href: 'update.html' }, 
-                { text: 'الصفحة الشخصية', textEn: 'Profile', icon: 'fa-user', href: 'profile.html' }
-            ]
-        };
+    const nav = document.getElementById("dynamic-nav");
+    const menuItems = {
+      employee: [
+        { text: "لوحة التحكم", textEn: "Dashboard", icon: "fa-chart-line", href: "emp_dashboard.html" },
+        { text: "رفع بلاغ", textEn: "Upload Report", icon: "fa-camera", href: "upload.html" },
+        { text: "المشاريع", textEn: "Projects", icon: "fa-folder-open", href: "projects.html" },
+        { text: "الصفحة الشخصية", textEn: "Profile", icon: "fa-user", href: "profile.html" },
+      ],
+      engineer: [
+        { text: "لوحة التحكم", textEn: "Dashboard", icon: "fa-gauge-high", href: "eng_dashboard.html" },
+        { text: "مشاريعي", textEn: "My Projects", icon: "fa-list-check", href: "my_projects.html" },
+        { text: "تحديث البلاغ", textEn: "Update Report", icon: "fa-pen-to-square", href: "update.html" },
+        { text: "الصفحة الشخصية", textEn: "Profile", icon: "fa-user", href: "profile.html" },
+      ],
+    };
 
-        // 4. رسم الروابط
-        const currentLinks = menuItems[role] || menuItems.employee;
-        
-        currentLinks.forEach(item => {
-            const li = document.createElement('li');
-            if (window.location.pathname.includes(item.href)) {
-                li.className = 'active';
-            }
-            // Translation improvement added: data-ar and data-en attributes for dynamic translation
-            li.innerHTML = `<a href="${item.href}" data-ar="${item.text}" data-en="${item.textEn}"><i class="fa-solid ${item.icon}"></i> ${item.text}</a>`;
-            nav.appendChild(li);
-        });
+    const currentLinks = menuItems[role] || menuItems.employee;
 
-        // Translation improvement added: Trigger language sync after sidebar load
-        if (typeof window.applyLanguage === "function") {
-            window.applyLanguage();
-        }
+    currentLinks.forEach((item) => {
+      const li = document.createElement("li");
+      if (window.location.pathname.includes(item.href)) {
+        li.className = "active";
+      }
 
-        // 5. تفعيل مستمع أحداث تسجيل الخروج
-        setupLogoutListener();
+      li.innerHTML = `<a href="${item.href}" data-ar="${item.text}" data-en="${item.textEn}"><i class="fa-solid ${item.icon}"></i> ${item.text}</a>`;
+      nav.appendChild(li);
+    });
 
-    } catch (error) {
-        console.error("خطأ في تحميل السايد بار:", error);
+    if (typeof window.applyLanguage === "function") {
+      window.applyLanguage();
     }
+
+    setupLogoutListener();
+  } catch (error) {
+    console.error("خطأ في تحميل السايد بار:", error);
+  }
 }
 
-/* --- دالة تسجيل الخروج المفصلة --- */
+/* ================= Logout Handling ================= */
 function setupLogoutListener() {
-    // نقوم بإزالة أي مستمع سابق لتجنب التكرار ثم نضيف الجديد
-    document.removeEventListener("click", handleLogoutClick); // خطوة اختيارية للتنظيف
-    document.addEventListener("click", handleLogoutClick);
+  document.removeEventListener("click", handleLogoutClick);
+  document.addEventListener("click", handleLogoutClick);
 }
 
-// دالة منفصلة للتعامل مع الضغطة
 function handleLogoutClick(e) {
-    const btn = e.target.closest(".logout-btn");
-    if (btn) {
-        e.preventDefault();
-        console.log("جاري محاولة تسجيل الخروج...");
+  const btn = e.target.closest(".logout-btn");
+  if (btn) {
+    e.preventDefault();
+    console.log("جاري محاولة تسجيل الخروج...");
 
-        // تأكدي أن auth و signOut تم استيرادهم في أعلى الملف
-        signOut(auth).then(() => {
-            localStorage.clear(); // مسح كل شيء لضمان النظافة
-            console.log("تم تسجيل الخروج بنجاح");
-            
-            // 🔥 أهم نقطة: تأكدي من مسار index.html
-            // إذا كنتِ في /templates/profile.html فالمسار ../index.html صحيح
-            window.location.replace("index.html?logout=success"); 
-        }).catch((error) => {
-            console.error("خطأ Firebase:", error);
-            alert("فشل تسجيل الخروج: " + error.message);
-        });
-    }
+    signOut(auth)
+      .then(() => {
+        localStorage.clear();
+        console.log("تم تسجيل الخروج بنجاح");
+        window.location.replace("index.html?logout=success");
+      })
+      .catch((error) => {
+        console.error("خطأ Firebase:", error);
+        alert("فشل تسجيل الخروج: " + error.message);
+      });
+  }
 }
 
-// تشغيل الدالة
-document.addEventListener('DOMContentLoaded', initializeSidebar);
+/* ================= Initialization ================= */
+document.addEventListener("DOMContentLoaded", initializeSidebar);

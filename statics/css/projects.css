@@ -1,4 +1,4 @@
-/* CONSTANTS */
+/* Design tokens used by project views. */
 :root {
   --green: #0b5f47;
   --green-dark: #084936;
@@ -12,7 +12,7 @@
   --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.14);
 }
 
-/* STATE/VARIABLES */
+/* Shared visual states and status indicators. */
 aside ul li.active {
   background: rgba(255, 255, 255, 0.25);
   font-weight: 600;
@@ -55,7 +55,7 @@ aside ul li.active {
   display: none;
 }
 
-/* HELPERS/UTILS */
+/* Reusable project components. */
 .status-dot {
   width: 12px;
   height: 12px;
@@ -68,7 +68,7 @@ aside ul li.active {
   font-weight: bold;
 }
 
-/* MAIN LOGIC */
+/* Main project layout. */
 body {
   margin: 0;
   font-family: "Cairo", sans-serif;
@@ -546,7 +546,7 @@ td {
 }
 /* ================= TOAST TYPES ================= */
 
-/* COMPLETE → GREEN */
+/* Completed and successful actions. */
 .toast.complete {
   background: linear-gradient(135deg, #e8f8f1, #f2fcf7);
   color: #0c5742;
@@ -560,7 +560,7 @@ td {
   box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
 }
 
-/* ASSIGN → BLUE */
+/* Assignment actions. */
 .toast.assign {
   background: linear-gradient(135deg, #eaf2ff, #f4f8ff);
   color: #1c3faa;
@@ -574,7 +574,7 @@ td {
   box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
 }
 
-/* REVERT → YELLOW */
+/* Reverted status actions. */
 .toast.revert {
   background: linear-gradient(135deg, #fff8e6, #fffdf2);
   color: #8a6d3b;
@@ -588,7 +588,7 @@ td {
   box-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
 }
 
-/* DELETE / ERROR → RED */
+/* Delete and error actions. */
 .toast.delete {
   background: linear-gradient(135deg, #fdecea, #fff5f5);
   color: #a94442;
@@ -601,7 +601,7 @@ td {
   color: white;
   box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
 }
-/* EVENT LISTENERS */
+/* Interactive controls and table states. */
 aside ul li:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(-2px);
@@ -685,7 +685,7 @@ body.english-mode .pagination {
   direction: ltr;
 }
 
-/* INITIALIZATION */
+/* Responsive layout rules. */
 @keyframes fadeIn {
   from {
     transform: translateY(10px);

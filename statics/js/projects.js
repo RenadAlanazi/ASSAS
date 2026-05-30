@@ -1,4 +1,4 @@
-/* =================================================== IMPORTS =================================================== */
+/* ================= Imports ================= */
 import { db, auth } from "./firebase.js";
 import {
   collection,
@@ -10,18 +10,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { addActivity, showToast } from "./utils.js";
 
-// --------- Translation & Theme Helpers (extracted from source) ---------
-// Retrieve current language, default to Arabic
+/* ================= Language and Theme Helpers ================= */
 function getLang() {
   return localStorage.getItem("language") || "ar";
 }
-// Shortcut to check if language is English
+
 const isEnglish = () => getLang() === "en";
-// Generic translation helper (mirrors existing translate function)
+
 function translateText(ar, en) {
   return isEnglish() ? en : ar;
 }
-// Apply saved theme (dark/light) on page load
+
 function applyTheme() {
   const theme = localStorage.getItem("theme") || "light";
   if (theme === "dark") {
@@ -30,10 +29,8 @@ function applyTheme() {
     document.body.classList.remove("dark");
   }
 }
-// Dark mode improvement added
-// Translation improvement added
 
-/* =================================================== CONSTANTS =================================================== */
+/* ================= Constants ================= */
 function translateSeverity(val) {
   const key = String(val || "").toLowerCase();
 
@@ -81,7 +78,7 @@ function translatePrediction(val) {
   return map[val]?.[isEnglish() ? "en" : "ar"] || val || "-";
 }
 
-/* =================================================== STATE/VARIABLES =================================================== */
+/* ================= State ================= */
 const tableBody = document.getElementById("tableBody");
 const searchInput = document.getElementById("searchInput");
 const filterSeverity = document.getElementById("filterSeverity");
@@ -105,7 +102,7 @@ let filteredReports = [];
 let currentPage = 1;
 const itemsPerPage = 8;
 
-/* =================================================== HELPERS/UTILS =================================================== */
+/* ================= Helpers ================= */
 const formatDate = (date) => {
   if (!date) return "-";
   const year = date.getFullYear();
@@ -114,7 +111,6 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// دالة توحيد مسميات الأضرار (لحل مشكلة اختلاف اللغات في الفلتر)
 function normalizeDamageType(value) {
   const damage = String(value || "").trim().toLowerCase();
 
@@ -176,7 +172,7 @@ const showConfirmModal = (title, text) => {
   });
 };
 
-/* =================================================== MAIN LOGIC =================================================== */
+/* ================= Projects Rendering ================= */
 const applyFiltersAndSearch = () => {
   const searchVal = searchInput.value.trim().toLowerCase();
   const severityVal = filterSeverity.value;
@@ -200,7 +196,6 @@ const applyFiltersAndSearch = () => {
       if (!report.id.includes(searchVal) && !street.includes(searchVal)) match = false;
     }
 
-    // --- تعديل فلتر الخطورة (Severity Filter) ---
     if (severityVal) {
       const reportSev = String(report.severity || "").toLowerCase();
       const filterSev = severityVal.toLowerCase();
@@ -220,7 +215,6 @@ const applyFiltersAndSearch = () => {
     if (statusVal && report.status !== statusVal) match = false;
     if (locationVal && (!report.street_name || !report.street_name.includes(locationVal))) match = false;
 
-    // --- تعديل فلتر نوع الضرر (Damage Type Filter) ---
     if (damageTypeVal) {
       const reportType = getReportDamageType(report);
       const selectedType = normalizeDamageType(damageTypeVal);
@@ -361,11 +355,16 @@ const deleteReport = async (id) => {
   );
   if (!confirmed) return;
   try {
+    const report = allReports.find((item) => item.id === id);
     await deleteDoc(doc(db, "reports", id));
      await addActivity(
       `تم حذف البلاغ #${id.substring(0,5)}`,
       "delete",
-      { reportId: id }
+      {
+        reportId: id,
+        targetUserId: report?.assigned_to || null,
+        actorUserId: auth.currentUser?.uid || null,
+      }
     );
     showToast(translateText("تم حذف البلاغ", "Report deleted"), "delete");
     if (reportDetailsCard.innerHTML.includes(id.substring(0, 5))) {
@@ -392,6 +391,7 @@ const completeReport = async (id) => {
       {
         reportId: id,
         targetUserId: engineerId,
+        actorUserId: auth.currentUser?.uid || null,
       }
     );
     showToast(translateText("تم تغير حالة البلاغ إلى 'مكتمل'", "Report status changed to 'Completed'"), "complete");
@@ -400,7 +400,7 @@ const completeReport = async (id) => {
   }
 };
 
-/* =================================================== EVENT LISTENERS =================================================== */
+/* ================= Event Listeners ================= */
 btnAll?.addEventListener("click", () => {
   currentView = "all";
   btnAll.classList.add("active");
@@ -493,6 +493,7 @@ tableBody.addEventListener("click", async (e) => {
   {
     reportId,
     targetUserId: engineerId,
+    actorUserId: auth.currentUser?.uid || null,
   }
 );
       showToast(translateText("تم تغيير حالة البلاغ إلى 'غير مكتمل'", "Report status changed to 'Pending'"), "revert");
@@ -517,6 +518,7 @@ tableBody.addEventListener("click", async (e) => {
         {
           reportId: el.dataset.report,
           targetUserId: el.dataset.user,
+          actorUserId: auth.currentUser?.uid || null,
         }
       );
       showToast(translateText(`تم إسناد البلاغ للمهندس ${engineerName}`, `Report assigned to engineer ${engineerName}`), "assign");
@@ -548,7 +550,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-/* =================================================== INITIALIZATION =================================================== */
+/* ================= Initialization ================= */
 onSnapshot(collection(db, "users"), (snapshot) => {
   usersMap = {};
   snapshot.docs.forEach(docSnap => {
@@ -565,8 +567,6 @@ onSnapshot(collection(db, "reports"), (snapshot) => {
     id: docSnap.id,
     ...docSnap.data(),
   }));
-  applyTheme(); // Apply saved theme at initialization
+  applyTheme();
   applyFiltersAndSearch();
 });
-// Initialization complete
-// Dark mode improvement added

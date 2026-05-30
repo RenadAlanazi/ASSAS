@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- settings and dark mode support added -->
+    <!-- Theme styles -->
     <link rel="stylesheet" href="../statics/css/settings.css" />
     <title>لوحة المهندس</title>
 
@@ -25,7 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- style sheet -->
+    <!-- Page stylesheet -->
     <link rel="stylesheet" href="../statics/css/dashboard.css" />
   </head>
 
@@ -37,7 +37,7 @@
       <!-- Main Content -->
       <main>
         <div class="topbar">
-          <!-- translation support injected -->
+          <!-- Page heading -->
           <h2 data-ar="لوحة المهندس" data-en="Engineer Dashboard">
             لوحة المهندس
           </h2>
@@ -65,7 +65,7 @@
         >
           <div style="text-align: center">
             <canvas id="assignedChart" width="150" height="150"></canvas>
-            <!-- translation support injected -->
+            <!-- High severity chart label -->
             <div style="margin-top: 8px" data-ar="بلاغاتي" data-en="My Reports">
               بلاغاتي
             </div>
@@ -73,7 +73,7 @@
 
           <div style="text-align: center">
             <canvas id="completedChart" width="150" height="150"></canvas>
-            <!-- translation support injected -->
+            <!-- Medium severity chart label -->
             <div style="margin-top: 8px" data-ar="مكتملة" data-en="Completed">
               مكتملة
             </div>
@@ -81,7 +81,7 @@
 
           <div style="text-align: center">
             <canvas id="inProgressChart" width="150" height="150"></canvas>
-            <!-- translation support injected -->
+            <!-- Low severity chart label -->
             <div
               style="margin-top: 8px"
               data-ar="قيد التنفيذ"
@@ -93,7 +93,7 @@
 
           <div style="text-align: center">
             <canvas id="totalChart" width="150" height="150"></canvas>
-            <!-- translation support injected -->
+            <!-- Completed reports chart label -->
             <div
               style="margin-top: 8px"
               data-ar="كل البلاغات"
@@ -111,7 +111,7 @@
         <div class="filter-section">
           <div class="filter-group">
             <select id="filterSeverity">
-              <!-- translation support injected -->
+              <!-- Search input -->
               <option
                 value=""
                 disabled
@@ -132,7 +132,7 @@
 
           <div class="filter-group">
             <select id="filterDamageType">
-              <!-- translation support injected -->
+              <!-- Severity filter options -->
               <option
                 value=""
                 disabled
@@ -158,7 +158,7 @@
 
           <div class="filter-group">
             <select id="filterLocation">
-              <!-- Injected translation support for location filter -->
+              <!-- Location filter options -->
               <option
                 value=""
                 disabled
@@ -234,12 +234,12 @@
           </div>
 
           <div class="filter-group">
-            <!-- translation support injected -->
+            <!-- Date range label -->
             <label data-ar="من" data-en="From">من</label>
             <input type="date" id="filterDateFrom" />
           </div>
           <div class="filter-group">
-            <!-- translation support injected -->
+            <!-- Date range label -->
             <label data-ar="إلى" data-en="To">إلى</label>
             <input type="date" id="filterDateTo" />
           </div>
@@ -247,7 +247,7 @@
           <div class="filter-actions">
             <button class="filter-btn reset-btn" id="resetFiltersBtn">
               <i class="fa-solid fa-rotate-right"></i>
-              <!-- translation support injected -->
+              <!-- Reset filters action -->
               <span data-ar="إعادة ضبط" data-en="Reset">إعادة ضبط</span>
             </button>
           </div>
@@ -257,7 +257,7 @@
         <table>
           <thead>
             <tr>
-              <!-- translation support injected -->
+              <!-- Reports table headers -->
               <th data-ar="إسناد" data-en="Assign">إسناد</th>
               <th data-ar="رقم البلاغ" data-en="Report ID">رقم البلاغ</th>
               <th data-ar="تاريخ الإنشاء" data-en="Created Date">
@@ -274,7 +274,7 @@
 
         <!-- Pagination -->
         <div class="pagination" id="paginationControls">
-          <!-- translation support injected -->
+          <!-- Previous page action -->
           <button
             class="page-btn"
             id="prevPageBtn"
@@ -309,7 +309,7 @@
         <!-- نافذة الإشعارات -->
         <div id="notificationPanel" class="hidden">
           <div class="notification-header">
-            <!-- translation support injected -->
+            <!-- Notification panel empty state -->
             <h3 data-ar="الإشعارات" data-en="Notifications">الإشعارات</h3>
           </div>
 
@@ -350,7 +350,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script type="module" src="../statics/js/loadSidebar.js"></script>
-    <!-- settings logic injected -->
+    <!-- Theme and language scripts -->
     <script type="module" src="../statics/js/settings.js"></script>
   </body>
 </html>

@@ -1,10 +1,8 @@
 const toastContainer = document.getElementById("toastContainer");
 
-/* ================= Toast ================= */
-
+/* ================= Toast Messages ================= */
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
-
   toast.className = `toast ${type}`;
 
   toast.innerHTML = `
@@ -24,14 +22,12 @@ function showToast(message, type = "success") {
   }, 3000);
 }
 
-/* ================= Forgot Password ================= */
-
+/* ================= Reset Code Request ================= */
 const emailInput = document.getElementById("email");
 const sendCodeBtn = document.getElementById("sendCodeBtn");
 
 if (sendCodeBtn) {
   sendCodeBtn.addEventListener("click", async () => {
-
     const email = emailInput.value.trim();
 
     if (!email) {
@@ -40,7 +36,6 @@ if (sendCodeBtn) {
     }
 
     try {
-
       sendCodeBtn.disabled = true;
       sendCodeBtn.textContent = "جاري الإرسال...";
 
@@ -48,11 +43,9 @@ if (sendCodeBtn) {
         "https://assas-backend-o9r8.onrender.com/auth/send-reset-code",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({ email }),
         }
       );
@@ -70,33 +63,25 @@ if (sendCodeBtn) {
       setTimeout(() => {
         window.location.href = "verify_code.html";
       }, 1000);
-
     } catch (error) {
-
       showToast(error.message, "error");
-
     } finally {
-
       sendCodeBtn.disabled = false;
       sendCodeBtn.textContent = "إرسال الكود";
     }
   });
 }
 
-/* ================= Verify Code ================= */
-
+/* ================= Code Verification ================= */
 const codeInput = document.getElementById("code");
 const verifyCodeBtn = document.getElementById("verifyCodeBtn");
 
 if (verifyCodeBtn) {
-
   verifyCodeBtn.addEventListener("click", async () => {
-
     const email = localStorage.getItem("reset_email");
     const code = codeInput.value.trim();
 
     if (!email) {
-
       showToast("الرجاء إدخال البريد الإلكتروني أولاً", "error");
 
       setTimeout(() => {
@@ -112,7 +97,6 @@ if (verifyCodeBtn) {
     }
 
     try {
-
       verifyCodeBtn.disabled = true;
       verifyCodeBtn.textContent = "جاري التحقق...";
 
@@ -120,11 +104,9 @@ if (verifyCodeBtn) {
         "https://assas-backend-o9r8.onrender.com/auth/verify-reset-code",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             email,
             code,
@@ -145,43 +127,29 @@ if (verifyCodeBtn) {
       setTimeout(() => {
         window.location.href = "reset_password.html";
       }, 1000);
-
     } catch (error) {
-
       showToast(error.message, "error");
-
     } finally {
-
       verifyCodeBtn.disabled = false;
       verifyCodeBtn.textContent = "تحقق";
     }
   });
 }
 
-/* ================= Reset Password ================= */
+/* ================= Password Update ================= */
 
 const newPassword = document.getElementById("newPassword");
-
-const confirmPassword =
-  document.getElementById("confirmPassword");
-
-const resetPasswordBtn =
-  document.getElementById("resetPasswordBtn");
+const confirmPassword = document.getElementById("confirmPassword");
+const resetPasswordBtn = document.getElementById("resetPasswordBtn");
 
 if (resetPasswordBtn) {
-
   resetPasswordBtn.addEventListener("click", async () => {
-
     const email = localStorage.getItem("reset_email");
-
     const code = localStorage.getItem("reset_code");
-
     const password = newPassword.value.trim();
-
     const confirm = confirmPassword.value.trim();
 
     if (!email || !code) {
-
       showToast(
         "انتهت جلسة إعادة التعيين، الرجاء البدء من جديد",
         "error"
@@ -195,14 +163,11 @@ if (resetPasswordBtn) {
     }
 
     if (!password || !confirm) {
-
       showToast("الرجاء تعبئة جميع الحقول", "error");
-
       return;
     }
 
     if (password.length < 6) {
-
       showToast(
         "كلمة المرور يجب أن تكون 6 خانات على الأقل",
         "error"
@@ -212,28 +177,21 @@ if (resetPasswordBtn) {
     }
 
     if (password !== confirm) {
-
       showToast("كلمة المرور غير متطابقة", "error");
-
       return;
     }
 
     try {
-
       resetPasswordBtn.disabled = true;
-
-      resetPasswordBtn.textContent =
-        "جاري التحديث...";
+      resetPasswordBtn.textContent = "جاري التحديث...";
 
       const response = await fetch(
         "https://assas-backend-o9r8.onrender.com/auth/reset-password",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             email,
             code,
@@ -245,14 +203,12 @@ if (resetPasswordBtn) {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-
         throw new Error(
           result.error || "تعذر تحديث كلمة المرور"
         );
       }
 
       localStorage.removeItem("reset_email");
-
       localStorage.removeItem("reset_code");
 
       showToast(
@@ -263,17 +219,11 @@ if (resetPasswordBtn) {
       setTimeout(() => {
         window.location.href = "eng_login.html";
       }, 1500);
-
     } catch (error) {
-
       showToast(error.message, "error");
-
     } finally {
-
       resetPasswordBtn.disabled = false;
-
-      resetPasswordBtn.textContent =
-        "تحديث كلمة المرور";
+      resetPasswordBtn.textContent = "تحديث كلمة المرور";
     }
   });
 }
